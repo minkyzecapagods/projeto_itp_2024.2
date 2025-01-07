@@ -43,14 +43,15 @@ int main(int argc, char *argv[]) {
         // 3. A partir do código EAN-8, criar uma imagem PBM
 
         //Ao chamar essa função sem nenhum argumento, exibe o uso no terminal
-        if (argc == 1) {
+        if (argc == 1 || argc > 10) {
                 usage();
                 return 1;
         }
-        INPUTInfo input;
+        INPUTInfo input = {4, 3, 50, -1};
         int opt;
         //Lida com os argumentos parseados
         //OBS: preciso trocar o atoi por strtol e considerar reportar erros
+
         while ((opt = getopt(argc, argv, ":m:a:h:n:")) != -1) {
                 switch(opt){
                         case 'h':
@@ -68,28 +69,45 @@ int main(int argc, char *argv[]) {
                         case 'n':
                                 printf("name = %s\n", optarg);
                                 if(optarg == 0) input.name = argv[-1]; else input.name = optarg;
+                                break;
                         case ':':
-                                printf("option needs a value %c\n", optarg);
+                                fprintf(stderr, "option needs a value");
                                 return 1;
                         break;
                         case '?':
-                                printf("unknown option: %c\n", optopt);
+                                fprintf(stderr,"unknown option: %c\n", optopt);
                                 return 1;
                         break;
                         default:
-                                printf("unexpected error");
+                                fprintf(stderr, "unexpected error");
                                 return 1;
                 }
-
         }
         //Verifica se o código de barra está sendo parseado
         if (optind < argc) {
-                printf(argv[optind]);
-                input.identifier = atoi(argv[optind]);
+                for(int i = optind; i < argc; i++) {
+                        int num = atoi(argv[i]);
+                        if (num > 0) {
+                                if (input.identifier == -1) {
+                                        input.identifier = num;
+                                        printf("identifier = %d\n", input.identifier);
+                                } else {
+                                        fprintf(stderr, "more than one identifier\n");
+                                        return 1;
+                                }
+                        }
+                        else {
+                                fprintf(stderr, "invalid identifier");
+                                return 1;
+                        }
+                }
         } else {
-                fprintf(stderr, "Error: Missing barcode indentifier.\n");
+                fprintf(stderr, "Error: Missing barcode identifier.\n");
                 return 1;
         }
-        printf(input.name, input.margin, input.area, input.height, input.identifier);
+        printf("Margin is %d\n", input.margin);
+        printf("Area is %d\n", input.area);
+        printf("Height is %d\n", input.height);
+        printf("Name is %s\n", input.name);
         return 0;
 }
