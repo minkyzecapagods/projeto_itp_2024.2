@@ -33,7 +33,7 @@ typedef struct {
         int margin;
         int area;
         int height;
-        int identifier;
+        int identifier[8];
         char *name;
 } INPUTInfo;
 
@@ -41,6 +41,8 @@ int main(int argc, char *argv[]) {
         // 1. Receber um código de 8 dígitos e verificar se ele é válido;
         // 2. Se for válido, converter o código de 8 dígitos para código EAN-8;
         // 3. A partir do código EAN-8, criar uma imagem PBM
+
+
 
         //Ao chamar essa função sem nenhum argumento, exibe o uso no terminal
         if (argc == 1 || argc > 10) {
@@ -105,6 +107,7 @@ int main(int argc, char *argv[]) {
                 fprintf(stderr, "Error: Missing barcode identifier.\n");
                 return 1;
         }
+
         printf("Margin is %d\n", input.margin);
         printf("Area is %d\n", input.area);
         printf("Height is %d\n", input.height);
