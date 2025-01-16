@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,6 +22,15 @@ void usage(){
         printf("\t-n <file_name>\n");
         printf("\t\tlet the user define the name for the output file according to the input in <file_name>\n");
         printf("\t\twithout -n, the name will be the identifier\n");
+}
+
+bool check_identifier(char *identifier) {
+        if (strlen(identifier) != 8) {
+                fprintf(stderr, "identifier must be 8 characters long\n");
+                return false;
+        }
+        return true;
+
 }
 
 typedef struct {
@@ -90,8 +100,10 @@ int main(int argc, char *argv[]) {
                 for(int i = optind; i < argc; i++) {
                         int num = atoi(argv[i]);
                         if (num > 0) {
-                                if (input.identifier == -1) {
-                                        input.identifier = num;
+                                if (input.identifier[0] == -1) {
+                                        char *identifier = argv[optind];
+                                        input.identifier[0] = atoi(identifier[4]);
+                                        if (check_identifier(argv[i])) strcpy(input.identifier, argv[i]); else fprintf(stderr, "invalid identifier.\n");
                                         printf("identifier = %d\n", input.identifier);
                                 } else {
                                         fprintf(stderr, "more than one identifier\n");
