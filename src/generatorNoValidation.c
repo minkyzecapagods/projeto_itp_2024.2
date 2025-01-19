@@ -125,7 +125,7 @@ int main() {
     // Imprimindo margens superiores
     for (int i = 0; i < margem; i++) {
         printf("%s\n", linha_margem);
-        fprintf(imagem, "%s", linha_margem);
+        fprintf(imagem, "%s\n", linha_margem);
     }
 
     // coluna_margem representa as margens laterais do arquivo PBM
@@ -148,13 +148,13 @@ int main() {
         printf("%s", linha_codigo);     // Código de barras expandido
         fprintf(imagem, "%s", linha_codigo);
         printf("%s\n", coluna_margem);  // Margem direita
-        fprintf(imagem,"%s", coluna_margem);
+        fprintf(imagem,"%s\n", coluna_margem);
     }
 
     // Imprimindo margens inferiores
     for (int i = 0; i < margem; i++) {
         printf("%s\n", linha_margem);
-        fprintf(imagem,"%s", linha_margem);
+        fprintf(imagem,"%s\n", linha_margem);
     }
     printf("\n========================FIM DO ARQUIVO PBM========================\n");
 
