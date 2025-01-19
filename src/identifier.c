@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <stdbool.h>
 
 // Função para calcular o dígito verificador
 int calcularDigitoVerificador(int identificador) {
@@ -14,7 +15,7 @@ int calcularDigitoVerificador(int identificador) {
     return proximoMultiploDez - soma;
 }
 
-void traduzirEAN8(int identificador) {
+char* traduzirEAN8(int identificador) {
     char lcodes[10][8] = {
         "0001101", "0011001", "0010011", "0111101", "0100011",
         "0110001", "0101111", "0111011", "0110111", "0001011"
@@ -25,7 +26,7 @@ void traduzirEAN8(int identificador) {
     };
 
     // Código de início do EAN-8
-    char codigo[100] = "101";
+    static char codigo[100] = "101";
 
     // Processa os primeiros 4 dígitos com L-code
     for (int i = 7; i >= 4; i--) {
@@ -46,25 +47,31 @@ void traduzirEAN8(int identificador) {
     strcat(codigo, "101");
 
     // Imprime o código de barras traduzido
-    printf("Código de Barras EAN-8: %s\n", codigo);
+    return codigo;
 }
 
 int main() {
     int identificador;
-    printf("Digite um identificador de 8 dígitos: ");
-    scanf("%d", &identificador);
+    bool valid_code = false;
+    while (!valid_code) {
+        printf("Digite um identificador de 8 dígitos: ");
+        scanf("%d", &identificador);
 
-    int digitoVerificadorEsperado = calcularDigitoVerificador(identificador);
-    int digitoVerificadorAtual = identificador % 10;
-
-    if (digitoVerificadorEsperado == digitoVerificadorAtual) {
-        printf("Identificador válido.\n");
-        traduzirEAN8(identificador);
-    } else {
-        printf("Erro: Dígito verificador inválido.\n"
+        int digitoVerificadorEsperado = calcularDigitoVerificador(identificador);
+        int digitoVerificadorAtual = identificador % 10;
+        if (digitoVerificadorEsperado != digitoVerificadorAtual) {
+            printf("Erro: Dígito verificador inválido.\n"
                "Para o código que você inseriu, o último digito deve ser: %d\n\n", digitoVerificadorEsperado);
-        printf("Nova tentativa necessária.\n");
+            printf("Nova tentativa necessária.\n");
+            continue;
+        }
+        valid_code = true;
+
     }
+
+    printf("Identificador válido.\n");
+    char* codigoDeBarras = traduzirEAN8(identificador);
+    printf("%s\n", codigoDeBarras);
 
     return 0;
 }
