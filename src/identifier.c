@@ -81,7 +81,7 @@ int main() {
     int altura_total = altura + (margem*2);
     int largura_total = (67*area) + (margem*2);
 
-    char* linha_codigo = (char*)malloc(sizeof(char) * (largura_total + 1));
+    char* linha_codigo = malloc(sizeof(char) * (largura_total + 1));
     for (int i = 0; i < strlen(codigoDeBarras); i++) {
         for (int j = 0; j < area; j++) {
             linha_codigo[i * area + j] = codigoDeBarras[i];
@@ -89,17 +89,41 @@ int main() {
     }
     linha_codigo[largura_total] = '\0';
     printf("%s\n", linha_codigo);
+
+    char* linha_margem = malloc(sizeof(char) * (largura_total + 1));
+    for (int i = 0; i < largura_total; i++) {
+        linha_margem[i] = '0';
+    }
+    linha_margem[largura_total] = '\0';
+    printf("%s\n", linha_margem);
+
+    printf("\n======================INICIO DO ARQUIVO PBM======================\n");
+    printf("P1\n");
+    printf("%d %d\n", largura_total, altura_total);
+
+    for (int i = 0; i < margem; i++) {
+        printf("%s\n", linha_margem);
+    }
+
+    char* coluna_margem = malloc(sizeof(char) * (margem + 1));
+    for (int i = 0; i < margem; i++) {
+        coluna_margem[i] = '0';
+    }
+
+    for (int i = 0; i < altura; i++) {
+        printf("%s", coluna_margem);
+        printf("%s", linha_codigo);
+        printf("%s\n", coluna_margem);
+    }
+
+    for (int i = 0; i < margem; i++) {
+        printf("%s\n", linha_margem);
+    }
+
+    free(coluna_margem);
+    free(linha_margem);
     free(linha_codigo);
 
-    // printf("\n======================INICIO DO ARQUIVO PBM======================\n");
-    // printf("P1\n");
-    // printf("%d %d", largura_total, altura_total);
-    //
-    // for (int i = 0; i < altura_total; i++) {
-    //     for (int j = 0; j < largura_total; j++) {
-    //
-    //     }
-    // }
 
     return 0;
 }
