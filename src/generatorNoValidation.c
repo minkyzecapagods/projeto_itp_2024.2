@@ -114,13 +114,18 @@ int main() {
     }
     linha_margem[largura_total] = '\0';
 
+    FILE *imagem = fopen("../imagem.pbm", "w");
+
     printf("\n======================INICIO DO ARQUIVO PBM======================\n");
     printf("P1\n");
+    fprintf(imagem, "P1\n");
     printf("%d %d\n", largura_total, altura_total);
+    fprintf(imagem, "%d %d\n", largura_total, altura_total);
 
     // Imprimindo margens superiores
     for (int i = 0; i < margem; i++) {
         printf("%s\n", linha_margem);
+        fprintf(imagem, "%s", linha_margem);
     }
 
     // coluna_margem representa as margens laterais do arquivo PBM
@@ -139,20 +144,24 @@ int main() {
     // Imprimindo os códigos já expandidos e com as margens, com a altura informada
     for (int i = 0; i < altura; i++) {
         printf("%s", coluna_margem);    // Margem esquerda
+        fprintf(imagem, "%s", coluna_margem);
         printf("%s", linha_codigo);     // Código de barras expandido
+        fprintf(imagem, "%s", linha_codigo);
         printf("%s\n", coluna_margem);  // Margem direita
+        fprintf(imagem,"%s", coluna_margem);
     }
 
     // Imprimindo margens inferiores
     for (int i = 0; i < margem; i++) {
         printf("%s\n", linha_margem);
+        fprintf(imagem,"%s", linha_margem);
     }
     printf("\n========================FIM DO ARQUIVO PBM========================\n");
 
+    fclose(imagem);
     free(coluna_margem);
     free(linha_margem);
     free(linha_codigo);
-
 
     return 0;
 }

@@ -7,5 +7,5 @@ include_directories(include)
 
 add_executable(Extractor src/EAN-8_code_extractor.c)
 add_executable(Generator src/EAN-8_code_generator.c)
-add_executable(ID src/identifier.c)
+add_executable(ID src/generatorNoValidation.c)
 target_link_libraries(ID m)
