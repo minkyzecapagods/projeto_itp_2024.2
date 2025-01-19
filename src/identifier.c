@@ -2,6 +2,7 @@
 #include <string.h>
 #include <math.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 // Função para calcular o dígito verificador
 int calcularDigitoVerificador(int identificador) {
@@ -72,6 +73,33 @@ int main() {
     printf("Identificador válido.\n");
     char* codigoDeBarras = traduzirEAN8(identificador);
     printf("%s\n", codigoDeBarras);
+
+    int margem = 4;
+    int area = 3;
+    int altura = 50;
+
+    int altura_total = altura + (margem*2);
+    int largura_total = (67*area) + (margem*2);
+
+    char* linha_codigo = (char*)malloc(sizeof(char) * (largura_total + 1));
+    for (int i = 0; i < strlen(codigoDeBarras); i++) {
+        for (int j = 0; j < area; j++) {
+            linha_codigo[i * area + j] = codigoDeBarras[i];
+        }
+    }
+    linha_codigo[largura_total] = '\0';
+    printf("%s\n", linha_codigo);
+    free(linha_codigo);
+
+    // printf("\n======================INICIO DO ARQUIVO PBM======================\n");
+    // printf("P1\n");
+    // printf("%d %d", largura_total, altura_total);
+    //
+    // for (int i = 0; i < altura_total; i++) {
+    //     for (int j = 0; j < largura_total; j++) {
+    //
+    //     }
+    // }
 
     return 0;
 }
