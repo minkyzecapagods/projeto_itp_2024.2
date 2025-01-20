@@ -8,7 +8,7 @@ void usage(){
         printf("BARCODE GENERATOR\n");
         printf("\tGenerates a PBM file based on the input.\n");
         printf("Usage:\n");
-        printf("\t/EAN-8_code_generator <option> ... <identifier>\n");
+        printf("\t./EAN-8_code_generator <option> ... <identifier>\n");
         printf("Options:\n");
         printf("\t-m <pixels>\n");
         printf("\t\tlet the user define the margin according to the integral input in <pixels>\n");
@@ -24,14 +24,6 @@ void usage(){
         printf("\t\twithout -n, the name will be the identifier\n");
 }
 
-bool check_identifier(char *identifier) {
-        if (strlen(identifier) != 8) {
-                fprintf(stderr, "identifier must be 8 characters long\n");
-                return false;
-        }
-        return true;
-}
-
 typedef struct {
         int width;
         int height;
@@ -43,7 +35,7 @@ typedef struct {
         int area;
         int height;
         int identifier[8];
-        char *name;
+        char title[21];
 } INPUTInfo;
 
 int main(int argc, char *argv[]) {
@@ -59,7 +51,7 @@ int main(int argc, char *argv[]) {
                 return 1;
         }
         if (argc > 10) {
-                fprintf(stderr, "INPUT ERROR: Too many arguments\n");
+                fprintf(stderr, "INPUT ERROR: Too many arguments.\n");
                 return 1;
         }
         INPUTInfo input = {4, 3, 50, -1};
@@ -70,27 +62,47 @@ int main(int argc, char *argv[]) {
         while ((opt = getopt(argc, argv, ":m:a:h:n:")) != -1) {
                 switch(opt){
                         case 'h':
-                                if(atoi(optarg) == 0) input.height = 50; else input.height = atoi(optarg);
+                                if(atoi(optarg) == 0) {
+                                        fprintf(stderr, "ERROR: Invalid value in option '-h'.\n");
+                                        return 1;
+                                }
+                                input.height = atoi(optarg);
                                 break;
                         case 'm':
-                                if(atoi(optarg) == 0) input.margin = 4; else input.margin = atoi(optarg);
-                        break;
+                                if(atoi(optarg) == 0) {
+                                        fprintf(stderr, "ERROR: Invalid value in option '-m'.\n");
+                                        return 1;
+                                }
+                                input.margin = atoi(optarg);
+                                break;
                         case 'a':
-                                if(atoi(optarg) == 0) input.area = 3; else input.area = atoi(optarg);
-                        break;
+                                if(atoi(optarg) == 0) {
+                                        fprintf(stderr, "ERROR: Invalid value in option '-a'.\n");
+                                        return 1;
+                                }
+                                input.area = atoi(optarg);
+                                break;
                         case 'n':
-                                if(optarg == 0) input.name = argv[-1]; else input.name = optarg;
+                                if(atoi(optarg) == 0) {
+                                        fprintf(stderr, "ERROR: Invalid value in option '-n'.\n");
+                                        return 1;
+                                }
+                                if (strlen(optarg) > 20) {
+                                        fprintf(stderr, "INPUT ERROR: Name is too long.\n");
+                                        return 1;
+                                }
+                                if(optarg != 0) strcpy(input.title, optarg);
                                 break;
                         case ':':
-                                fprintf(stderr, "option needs a value");
+                                fprintf(stderr, "INPUT ERROR: Option '-%c' needs a value.\n", optopt);
                                 return 1;
                         break;
                         case '?':
-                                fprintf(stderr,"unknown option: %c\n", optopt);
+                                fprintf(stderr,"INPUT ERROR: '-%c' is an unknown option.\n", optopt);
                                 return 1;
                         break;
                         default:
-                                fprintf(stderr, "unexpected error");
+                                fprintf(stderr, "ERROR: Unexpected error.\n");
                                 return 1;
                 }
         }
@@ -98,8 +110,11 @@ int main(int argc, char *argv[]) {
         if (optind < argc) {
                 for(int i = optind; i < argc; i++) {
                         if (strlen(argv[i]) != 8) {
-                                fprintf(stderr, "INPUT ERROR: Identifier must be 8 characters long\n");
+                                fprintf(stderr, "INPUT ERROR: Identifier must be 8 characters long.\n");
                                 return 1;
+                        }
+                        if (input.title[0] == '\0') {
+                                strcpy(input.title, argv[i]);
                         }
                         int num = atoi(argv[i]);
                         if (num > 0) {
@@ -126,7 +141,7 @@ int main(int argc, char *argv[]) {
         printf("Margin is %d\n", input.margin);
         printf("Area is %d\n", input.area);
         printf("Height is %d\n", input.height);
-        printf("Name is %s\n", input.name);
+        printf("Name is %s\n", input.title);
         for (int i = 0; i < 8; i++) {
                 printf("%d", input.identifier[i]);
         }
