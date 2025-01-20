@@ -26,7 +26,7 @@ void usage(){
 typedef struct {
         int width;
         int height;
-        char title[28];
+        char filename[40];
         char *code;
 } PBMImage;
 
@@ -34,22 +34,23 @@ typedef struct {
         int margin;
         int area;
         int height;
-        int identifier[8];
-        char title[21];
-} INPUTInfo;
+        char identifier[9];
+        char title[30];
+} GENInfo;
 
 // Função para calcular o dígito verificador
 
-int calcularDigitoVerificador(const int *id) {
+char calcularDigitoVerificador(const char *id) {
         int soma = 0;
         for (int i = 1; i < 8; i++) {
-                soma += id[i-1] * ((i % 2 == 1) ? 3 : 1);
+                soma += (id[i-1] - '0') * ((i % 2 == 1) ? 3 : 1);
         }
         int proximoMultiploDez = ((soma + 9) / 10) * 10; // Encontra o próximo múltiplo de 10
-        return proximoMultiploDez - soma;
+        int resultado = proximoMultiploDez - soma;
+        return resultado + '0';
 }
 
-char* traduzirEAN8(const int *id) {
+char* traduzirEAN8(const char *id) {
         const char lcodes[10][8] = {
                 "0001101", "0011001", "0010011", "0111101", "0100011",
                 "0110001", "0101111", "0111011", "0110111", "0001011"
@@ -64,7 +65,8 @@ char* traduzirEAN8(const int *id) {
 
         // Processa os primeiros 4 dígitos com L-code
         for (int i = 0; i < 4; i++) {
-                strcat(codigo, lcodes[id[i]]);
+                int ind = id[i] - '0';
+                strcat(codigo, lcodes[ind]);
         }
 
         // Adiciona o código do meio
@@ -72,7 +74,8 @@ char* traduzirEAN8(const int *id) {
 
         // Processa os últimos 4 dígitos com R-code
         for (int i = 4; i < 8; i++) {
-                strcat(codigo, rcodes[id[i]]);
+                int ind = id[i] - '0';
+                strcat(codigo, rcodes[ind]);
         }
 
         // Adiciona o código de fim
@@ -97,7 +100,7 @@ int main(const int argc, char *argv[]) {
                 fprintf(stderr, "INPUT ERROR: Too many arguments.\n");
                 return 1;
         }
-        INPUTInfo input = {4, 3, 50, -1};
+        GENInfo input = {4, 3, 50, 'e'};
         int opt, num;
         //Lida com os argumentos parseados
         //OBS: preciso trocar o atoi por strtol e considerar reportar erros
@@ -106,7 +109,7 @@ int main(const int argc, char *argv[]) {
                 switch(opt){
                         case 'h':
                                 num = atoi(optarg);
-                                if(num == 0 || num > 1000) {
+                                if(num == 0 || num > 1024) {
                                         fprintf(stderr, "ERROR: Invalid value in option '-h'.\n");
                                         return 1;
                                 }
@@ -114,7 +117,7 @@ int main(const int argc, char *argv[]) {
                                 break;
                         case 'm':
                                 num = atoi(optarg);
-                                if(num == 0 || num > 1000) {
+                                if(num == 0 || num > 1024) {
                                         fprintf(stderr, "ERROR: Invalid value in option '-m'.\n");
                                         return 1;
                                 }
@@ -122,7 +125,7 @@ int main(const int argc, char *argv[]) {
                                 break;
                         case 'a':
                                 num = atoi(optarg);
-                                if(num == 0 || num > 1000) {
+                                if(num == 0 || num > 1024) {
                                         fprintf(stderr, "ERROR: Invalid value in option '-a'.\n");
                                         return 1;
                                 }
@@ -158,9 +161,10 @@ int main(const int argc, char *argv[]) {
                         }
                         int num = atoi(argv[i]);
                         if (num > 0) {
-                                if (input.identifier[0] == -1) {
+                                if (input.identifier[0] == 'e') {
                                         for (int j = 7; j >= 0; j--) {
-                                                input.identifier[j] = num % 10;
+                                                char id = (num % 10) + '0';
+                                                input.identifier[j] = id;
                                                 num /= 10;
                                         }
                                 } else {
@@ -178,10 +182,12 @@ int main(const int argc, char *argv[]) {
                 return 1;
         }
 
-        const int digitoVerificadorEsperado = calcularDigitoVerificador(input.identifier);
+        input.identifier[8] = '\0';
+
+        const char digitoVerificadorEsperado = calcularDigitoVerificador(input.identifier);
         if (input.identifier[7] != digitoVerificadorEsperado) {
                 fprintf(stderr, "INPUT ERROR: Dígito verificador inválido.\n"
-               "Para o código que você inseriu, o último digito deve ser: %d\n", digitoVerificadorEsperado);
+               "Para o código que você inseriu, o último digito deve ser: %c\n", digitoVerificadorEsperado);
                 return 1;
         }
 
@@ -191,15 +197,17 @@ int main(const int argc, char *argv[]) {
         pbmImage.code = traduzirEAN8(input.identifier);
         char *pre = "../";
         char *pbm = ".pbm";
-        sprintf(pbmImage.title, "%s%s%s", pre, input.title, pbm);
+        sprintf(pbmImage.filename, "%s%s%s", pre, input.title, pbm);
 
-        if (pbmImage.height > 1000 || pbmImage.width > 1000) {
+        printf(pbmImage.code, "\n\n");
+
+        if (pbmImage.height > 1024 || pbmImage.width > 1024) {
                 fprintf(stderr, "INPUT ERROR: Image too big.\n");
                 return 1;
         }
 
-        if (fopen(pbmImage.title, "r") != NULL) {
-                fprintf(stderr, "INPUT ERROR: '%s' already exists.\n", pbmImage.title);
+        if (fopen(pbmImage.filename, "r") != NULL) {
+                fprintf(stderr, "INPUT ERROR: '%s' already exists.\n", pbmImage.filename);
                 return 1;
         }
 
@@ -242,7 +250,15 @@ int main(const int argc, char *argv[]) {
                 coluna_margem[i] = '0';
         }
 
-        FILE *imagem = fopen(pbmImage.title, "w");
+        FILE *imagem = fopen(pbmImage.filename, "w");
+        if (imagem == NULL) {
+                fprintf(stderr, "ERROR: Something went wrong when trying to open a file.\n");
+                free(linha_codigo);
+                free(linha_margem);
+                return 1;
+        }
+
+        printf(linha_codigo,"\n\n");
 
         printf("\n======================INICIO DO ARQUIVO PBM======================\n");
         printf("P1\n");
@@ -277,9 +293,7 @@ int main(const int argc, char *argv[]) {
         printf("Area is %d\n", input.area);
         printf("Height is %d\n", input.height);
         printf("Name is %s\n", input.title);
-        for (int i = 0; i < 8; i++) {
-                printf("%d", input.identifier[i]);
-        }
+        printf("Identifier is %s\n", input.identifier);
 
         fclose(imagem);
         free(coluna_margem);
