@@ -30,7 +30,6 @@ bool check_identifier(char *identifier) {
                 return false;
         }
         return true;
-
 }
 
 typedef struct {
@@ -55,8 +54,12 @@ int main(int argc, char *argv[]) {
 
 
         //Ao chamar essa função sem nenhum argumento, exibe o uso no terminal
-        if (argc == 1 || argc > 10) {
+        if (argc == 1) {
                 usage();
+                return 1;
+        }
+        if (argc > 10) {
+                fprintf(stderr, "INPUT ERROR: Too many arguments\n");
                 return 1;
         }
         INPUTInfo input = {4, 3, 50, -1};
@@ -67,19 +70,15 @@ int main(int argc, char *argv[]) {
         while ((opt = getopt(argc, argv, ":m:a:h:n:")) != -1) {
                 switch(opt){
                         case 'h':
-                                printf("height = %d\n", atoi(optarg));
                                 if(atoi(optarg) == 0) input.height = 50; else input.height = atoi(optarg);
                                 break;
                         case 'm':
-                                printf("margin = %d\n", atoi(optarg));
                                 if(atoi(optarg) == 0) input.margin = 4; else input.margin = atoi(optarg);
                         break;
                         case 'a':
-                                printf("area = %d\n", atoi(optarg));
                                 if(atoi(optarg) == 0) input.area = 3; else input.area = atoi(optarg);
                         break;
                         case 'n':
-                                printf("name = %s\n", optarg);
                                 if(optarg == 0) input.name = argv[-1]; else input.name = optarg;
                                 break;
                         case ':':
@@ -98,25 +97,29 @@ int main(int argc, char *argv[]) {
         //Verifica se o código de barra está sendo parseado
         if (optind < argc) {
                 for(int i = optind; i < argc; i++) {
+                        if (strlen(argv[i]) != 8) {
+                                fprintf(stderr, "INPUT ERROR: Identifier must be 8 characters long\n");
+                                return 1;
+                        }
                         int num = atoi(argv[i]);
                         if (num > 0) {
                                 if (input.identifier[0] == -1) {
-                                        char *identifier = argv[optind];
-                                        input.identifier[0] = atoi(identifier[4]);
-                                        if (check_identifier(argv[i])) strcpy(input.identifier, argv[i]); else fprintf(stderr, "invalid identifier.\n");
-                                        printf("identifier = %d\n", input.identifier);
+                                        for (int i = 7; i >= 0; i--) {
+                                                input.identifier[i] = num % 10;
+                                                num /= 10;
+                                        }
                                 } else {
-                                        fprintf(stderr, "more than one identifier\n");
+                                        fprintf(stderr, "INPUT ERROR: More than one identifier.\n");
                                         return 1;
                                 }
                         }
                         else {
-                                fprintf(stderr, "invalid identifier");
+                                fprintf(stderr, "INPUT ERROR: Invalid identifier");
                                 return 1;
                         }
                 }
         } else {
-                fprintf(stderr, "Error: Missing barcode identifier.\n");
+                fprintf(stderr, "INPUT ERROR: Missing barcode identifier.\n");
                 return 1;
         }
 
@@ -124,5 +127,8 @@ int main(int argc, char *argv[]) {
         printf("Area is %d\n", input.area);
         printf("Height is %d\n", input.height);
         printf("Name is %s\n", input.name);
+        for (int i = 0; i < 8; i++) {
+                printf("%d", input.identifier[i]);
+        }
         return 0;
 }
