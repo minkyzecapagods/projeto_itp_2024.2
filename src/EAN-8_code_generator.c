@@ -1,4 +1,3 @@
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -99,38 +98,37 @@ int main(const int argc, char *argv[]) {
                 return 1;
         }
         INPUTInfo input = {4, 3, 50, -1};
-        int opt;
+        int opt, num;
         //Lida com os argumentos parseados
         //OBS: preciso trocar o atoi por strtol e considerar reportar erros
 
         while ((opt = getopt(argc, argv, ":m:a:h:n:")) != -1) {
                 switch(opt){
                         case 'h':
-                                if(atoi(optarg) == 0) {
+                                num = atoi(optarg);
+                                if(num == 0 || num > 1000) {
                                         fprintf(stderr, "ERROR: Invalid value in option '-h'.\n");
                                         return 1;
                                 }
                                 input.height = atoi(optarg);
                                 break;
                         case 'm':
-                                if(atoi(optarg) == 0) {
+                                num = atoi(optarg);
+                                if(num == 0 || num > 1000) {
                                         fprintf(stderr, "ERROR: Invalid value in option '-m'.\n");
                                         return 1;
                                 }
                                 input.margin = atoi(optarg);
                                 break;
                         case 'a':
-                                if(atoi(optarg) == 0) {
+                                num = atoi(optarg);
+                                if(num == 0 || num > 1000) {
                                         fprintf(stderr, "ERROR: Invalid value in option '-a'.\n");
                                         return 1;
                                 }
                                 input.area = atoi(optarg);
                                 break;
                         case 'n':
-                                if(atoi(optarg) == 0) {
-                                        fprintf(stderr, "ERROR: Invalid value in option '-n'.\n");
-                                        return 1;
-                                }
                                 if (strlen(optarg) > 20) {
                                         fprintf(stderr, "INPUT ERROR: Name is too long.\n");
                                         return 1;
@@ -194,6 +192,11 @@ int main(const int argc, char *argv[]) {
         char *pre = "../";
         char *pbm = ".pbm";
         sprintf(pbmImage.title, "%s%s%s", pre, input.title, pbm);
+
+        if (pbmImage.height > 1000 || pbmImage.width > 1000) {
+                fprintf(stderr, "INPUT ERROR: Image too big.\n");
+                return 1;
+        }
 
         if (fopen(pbmImage.title, "r") != NULL) {
                 fprintf(stderr, "INPUT ERROR: '%s' already exists.\n", pbmImage.title);
