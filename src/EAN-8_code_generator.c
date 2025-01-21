@@ -5,22 +5,22 @@
 
 void usage(){
         printf("BARCODE GENERATOR\n");
-        printf("\tGenerates a PBM file based on the input.\n");
-        printf("Usage:\n");
-        printf("\t./EAN-8_code_generator <option> ... <identifier>\n");
-        printf("Options:\n");
+        printf("\tGera um arquivo PBM baseado no input do usuário.\n");
+        printf("Uso:\n");
+        printf("\t./EAN-8_code_generator <opção> ... <identificador>\n");
+        printf("Ooções:\n");
         printf("\t-m <pixels>\n");
-        printf("\t\tlet the user define the margin according to the integral input in <pixels>\n");
-        printf("\t\twithout -m, the margin will be 4px\n");
+        printf("\t\tdeixa o usuário definir a margem baseado no input em <pixels>\n");
+        printf("\t\tsem -m, a margem será de 4px.\n");
         printf("\t-a <pixels>\n");
-        printf("\t\tlet the user define the area for the code according to the integral input in <pixels>\n");
-        printf("\t\twithout -a, the area will be 3px\n");
+        printf("\t\tdeixa o usuário definir a área das barras baseada no input em <pixels>\n");
+        printf("\t\tsem -a, a área será de 3px.\n");
         printf("\t-h <pixels>\n");
-        printf("\t\tlet the user define the height for the barcode according to the integral input in <pixels>\n");
-        printf("\t\twithout -h, the height will be 50px\n");
+        printf("\t\tdeixa o usuário definir a altura do código de barras baseada no input em <pixels>\n");
+        printf("\t\tserá -h, a altura será de 50px.\n");
         printf("\t-n <file_name>\n");
-        printf("\t\tlet the user define the name for the output file according to the input in <file_name>\n");
-        printf("\t\twithout -n, the name will be the identifier\n");
+        printf("\t\tdeixa o usuário definir o nome do arquivo .pbm gerado baseado no input <file_name>\n");
+        printf("\t\tsem -n, o nome do arquivo será o identificador fornecido.\n");
 }
 
 typedef struct {
@@ -97,7 +97,7 @@ int main(const int argc, char *argv[]) {
                 return 1;
         }
         if (argc > 10) {
-                fprintf(stderr, "INPUT ERROR: Too many arguments.\n");
+                fprintf(stderr, "INPUT ERROR: Muitos argumentos.\n");
                 return 1;
         }
         GENInfo input = {4, 3, 50, 'e'};
@@ -110,7 +110,7 @@ int main(const int argc, char *argv[]) {
                         case 'h':
                                 num = atoi(optarg);
                                 if(num == 0 || num > 1024) {
-                                        fprintf(stderr, "ERROR: Invalid value in option '-h'.\n");
+                                        fprintf(stderr, "ERROR: Valor inválido para opção '-h'.\n");
                                         return 1;
                                 }
                                 input.height = atoi(optarg);
@@ -118,7 +118,7 @@ int main(const int argc, char *argv[]) {
                         case 'm':
                                 num = atoi(optarg);
                                 if(num == 0 || num > 1024) {
-                                        fprintf(stderr, "ERROR: Invalid value in option '-m'.\n");
+                                        fprintf(stderr, "ERROR: Valor inválido para opção '-m'.\n");
                                         return 1;
                                 }
                                 input.margin = atoi(optarg);
@@ -126,26 +126,27 @@ int main(const int argc, char *argv[]) {
                         case 'a':
                                 num = atoi(optarg);
                                 if(num == 0 || num > 1024) {
-                                        fprintf(stderr, "ERROR: Invalid value in option '-a'.\n");
+                                        fprintf(stderr, "ERROR: Valor inválido para opção '-a'.\n");
                                         return 1;
                                 }
                                 input.area = atoi(optarg);
                                 break;
                         case 'n':
                                 if (strlen(optarg) > 20) {
-                                        fprintf(stderr, "INPUT ERROR: Name is too long.\n");
+                                        fprintf(stderr, "INPUT ERROR: O nome do arquivo é muito grande.\n"
+                                                        "Ele deve conter no máximo 20 dígitos");
                                         return 1;
                                 }
                                 if(optarg != 0) strcpy(input.title, optarg);
                                 break;
                         case ':':
-                                fprintf(stderr, "INPUT ERROR: Option '-%c' needs a value.\n", optopt);
+                                fprintf(stderr, "INPUT ERROR: Opção '-%c' precisa receber um valor.\n", optopt);
                                 return 1;
                         case '?':
-                                fprintf(stderr,"INPUT ERROR: '-%c' is an unknown option.\n", optopt);
+                                fprintf(stderr,"INPUT ERROR: '-%c' é uma opção inválida.\n", optopt);
                                 return 1;
                         default:
-                                fprintf(stderr, "ERROR: Unexpected error.\n");
+                                fprintf(stderr, "ERROR: Erro inesperado.\n");
                                 return 1;
                 }
         }
@@ -153,7 +154,7 @@ int main(const int argc, char *argv[]) {
         if (optind < argc) {
                 for(int i = optind; i < argc; i++) {
                         if (strlen(argv[i]) != 8) {
-                                fprintf(stderr, "INPUT ERROR: Identifier must be 8 characters long.\n");
+                                fprintf(stderr, "INPUT ERROR: O identificador deve conter exatamente 8 caracteres.\n");
                                 return 1;
                         }
                         if (input.title[0] == '\0') {
@@ -168,17 +169,17 @@ int main(const int argc, char *argv[]) {
                                                 num /= 10;
                                         }
                                 } else {
-                                        fprintf(stderr, "INPUT ERROR: More than one identifier.\n");
+                                        fprintf(stderr, "INPUT ERROR: Mais de um identificador encontrado.\n");
                                         return 1;
                                 }
                         }
                         else {
-                                fprintf(stderr, "INPUT ERROR: Invalid identifier");
+                                fprintf(stderr, "INPUT ERROR: Identificador inválido");
                                 return 1;
                         }
                 }
         } else {
-                fprintf(stderr, "INPUT ERROR: Missing barcode identifier.\n");
+                fprintf(stderr, "INPUT ERROR: Identificador não encontrado.\n");
                 return 1;
         }
 
@@ -202,12 +203,12 @@ int main(const int argc, char *argv[]) {
         printf(pbmImage.code, "\n\n");
 
         if (pbmImage.height > 1024 || pbmImage.width > 1024) {
-                fprintf(stderr, "INPUT ERROR: Image too big.\n");
+                fprintf(stderr, "INPUT ERROR: Imagem muito longa.\n");
                 return 1;
         }
 
         if (fopen(pbmImage.filename, "r") != NULL) {
-                fprintf(stderr, "INPUT ERROR: '%s' already exists.\n", pbmImage.filename);
+                fprintf(stderr, "INPUT ERROR: O arquivo '%s'.pbm já existe.\n", pbmImage.filename);
                 return 1;
         }
 
@@ -252,9 +253,10 @@ int main(const int argc, char *argv[]) {
 
         FILE *imagem = fopen(pbmImage.filename, "w");
         if (imagem == NULL) {
-                fprintf(stderr, "ERROR: Something went wrong when trying to open a file.\n");
+                fprintf(stderr, "ERROR: Algo deu errado ao abrir o arquivo.\n");
                 free(linha_codigo);
                 free(linha_margem);
+                free(coluna_margem);
                 return 1;
         }
 
@@ -289,11 +291,11 @@ int main(const int argc, char *argv[]) {
         }
         printf("\n========================FIM DO ARQUIVO PBM========================\n");
 
-        printf("Margin is %d\n", input.margin);
-        printf("Area is %d\n", input.area);
-        printf("Height is %d\n", input.height);
-        printf("Name is %s\n", input.title);
-        printf("Identifier is %s\n", input.identifier);
+        printf("Valor da margem: %d\n", input.margin);
+        printf("Valor da área: %d\n", input.area);
+        printf("Valor da altura: %d\n", input.height);
+        printf("Nome do arquivo: %s\n", input.title);
+        printf("Código identificador: %s\n", input.identifier);
 
         fclose(imagem);
         free(coluna_margem);

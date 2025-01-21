@@ -19,9 +19,9 @@ char calcularDigitoVerificador(const char *id) {
 
 void usage() {
         printf("BARCODE READER\n");
-        printf("\tExtracts the barcode indentifier from the input PBM file.\n");
-        printf("Usage:\n");
-        printf("\t/EAN-8_code_extractor <input_file_path>\n");
+        printf("\tExtrai o código identificador do arquivo .pbm informado.\n");
+        printf("Uso:\n");
+        printf("\t/EAN-8_code_extractor <caminho_codigo_de_barras>\n");
 }
 
 typedef struct {
@@ -52,8 +52,8 @@ int main(const int argc, char *argv[]) {
         if (input == NULL) {
                 fprintf(
                         stderr,
-                        "ERROR: Something went wrong when trying to open the input file. "
-                        "Check the name or specify the correct file path.\n");
+                        "ERROR: Algo deu errado ao tentar abrir o arquivo. "
+                        "Confira o nome dele ou informe o caminho correto.\n");
                 return 1;
         }
 
@@ -62,24 +62,24 @@ int main(const int argc, char *argv[]) {
         char st2[5];
         fscanf(input, "%s", validador);
         if (strcmp(validador, "P1") != 0) {
-                fprintf(stderr,"ERROR: Wrong file format.\n");
+                fprintf(stderr,"ERROR: Tipo de arquivo inválido.\n");
                 goto cleanup;
         }
         if (fscanf(input, "%s %s", st1, st2) == EOF) {
-                fprintf(stderr,"ERROR: Wrong file format.\n"
-                        "Couldn't read the file dimensions.\n");
+                fprintf(stderr,"ERROR: Tipo de arquivo inválido.\n"
+                        "Não foi possível ler as dimensões do código de barras.\n");
                 goto cleanup;
         };
         const int width = atoi(st1);
         if (width <= 0 || width > 1024) {
-                fprintf(stderr,"ERROR: Wrong file format.\n"
-                       "The file is too big.\n");
+                fprintf(stderr,"ERROR: Tipo de arquivo inválido.\n"
+                       "O arquivo é muito grande.\n");
                 goto cleanup;
         }
 
         char* linha = malloc(sizeof(char) * width + 1);
         if (linha == NULL) {
-                fprintf(stderr,"ERROR: Memory allocation failed.\n");
+                fprintf(stderr,"ERROR: Falha na alocação de memória.\n");
                 goto cleanup;
         }
 
@@ -93,8 +93,8 @@ int main(const int argc, char *argv[]) {
                 }
         }
         if (barcodeInfo.margin == -1) {
-                fprintf(stderr, "ERROR: Wrong file format.\n"
-                       "The file is blank, there is no barcode to be read.\n");
+                fprintf(stderr, "ERROR: Tipo de arquivo inválido.\n"
+                       "O arquivo está vazio ou não existe código de barras para ser lido.\n");
                 goto cleanup;
         }
         linha[width] = '\0';
@@ -104,7 +104,7 @@ int main(const int argc, char *argv[]) {
         const int comprimento_expandido = width - (barcodeInfo.margin * 2) + 1;
         char *linha_sem_margem = malloc(sizeof(char) * comprimento_expandido);
         if (linha_sem_margem == NULL) {
-                fprintf(stderr, "ERROR: Memory allocation failed.\n");
+                fprintf(stderr, "ERROR: Falha na alocação de memória.\n");
                 goto cleanup;
         }
         int j = 0;
@@ -127,7 +127,7 @@ int main(const int argc, char *argv[]) {
 
         char* string_original = malloc((sizeof(char) * comprimento_original) + 1);
         if (string_original == NULL) {
-                fprintf(stderr, "ERROR: Memory allocation failed.\n");
+                fprintf(stderr, "ERROR: Falha na alocação de memória.\n");
                 goto cleanup;
         }
         for (int i = 0; i < comprimento_original; i++) {
@@ -141,16 +141,16 @@ int main(const int argc, char *argv[]) {
 
         if (strncmp(string_original, "101", 3) != 0 ||
                 strncmp(string_original + comprimento_original - 3, "101", 3) != 0) {
-                fprintf(stderr, "ERROR: Wrong file format.\n"
-                                "There is no beginning or end marker. "
-                                "The barcode should start and finish with a '101' sequence.\n");
+                fprintf(stderr, "ERROR: Tipo de arquivo inválido.\n"
+                                "O início e fim do código de barras não foi encontrado. "
+                                "O código de barras deve iniciar e finalizar com '101'.\n");
                 goto cleanup;
         }
 
         if (strncmp(string_original + 31, "01010", 3) != 0) {
-                fprintf(stderr, "ERROR: Wrong file format.\n"
-                                "There is no middle marker. "
-                                "The middle of the barcode should be marked by a '01010' sequence.\n");
+                fprintf(stderr, "ERROR: Tipo de arquivo inválido.\n"
+                                "O meio do código de barras não foi encontrado. "
+                                "O código de barras deve conter '01010' no meio.\n");
                 goto cleanup;
         }
 
@@ -189,8 +189,8 @@ int main(const int argc, char *argv[]) {
 
         char verificador = calcularDigitoVerificador(barcodeInfo.identifier);
         if (verificador != barcodeInfo.identifier[7]) {
-                fprintf(stderr, "ERROR: Wrong file format.\n"
-                                "Invalid barcode. The identifier should end with the number %d.\n", verificador);
+                fprintf(stderr, "ERROR: Tipo de arquivo inválido.\n"
+                                "O código identificador é inválido. Seu dígito verificador deve ser: %d.\n", verificador);
                 goto cleanup;
         }
 
