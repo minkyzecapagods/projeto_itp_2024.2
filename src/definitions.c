@@ -1,7 +1,8 @@
 //
 // Created by zecapagods on 1/22/25.
 //
-#include "cons.h"
+
+#include "../include/definitions.h"
 
 const char l_codes[10][8] = {
     "0001101", "0011001", "0010011", "0111101", "0100011",

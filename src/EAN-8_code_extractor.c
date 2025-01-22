@@ -7,16 +7,16 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <definitions.h>
-#include <funcs.h>
-#include <io.h>
+#include "../include/definitions.h"
+#include "../include/funcs.h"
+#include "../include/io.h"
 
 int main(const int argc, char *argv[]) {
         if (argc != 2) {
                 extractor_usage();
                 return 1;
         }
-        GenInfo barcodeInfo = {-1};
+        GenInfo barcode_info = {-1};
         FILE *input_file = fopen(argv[1], "r");
         if (input_file == NULL) {
                 fprintf(
@@ -52,16 +52,17 @@ int main(const int argc, char *argv[]) {
                 goto cleanup;
         }
 
-        while (barcodeInfo.margin == -1) {
+        // seria interessante modularizar essa parte do código
+        while (barcode_info.margin == -1) {
                 if (fscanf(input_file, "%s", file_line) == EOF) break;
                 for (int i = 0; i < width; i++) {
                         if (file_line[i] == '1') {
-                                barcodeInfo.margin = i;
+                                barcode_info.margin = i;
                                 break;
                         }
                 }
         }
-        if (barcodeInfo.margin == -1) {
+        if (barcode_info.margin == -1) {
                 fprintf(stderr, "ERRO: Tipo de arquivo inválido.\n"
                        "O arquivo está vazio ou não existe código de barras para ser lido.\n");
                 goto cleanup;
@@ -70,14 +71,14 @@ int main(const int argc, char *argv[]) {
         if (fclose(input_file) == EOF) fprintf(stderr, "ERRO: Erro crítico ao fechar o arquivo.\n");
         input_file = NULL;
 
-        const int barcode_width = width - (barcodeInfo.margin * 2) + 1;
+        const int barcode_width = width - (barcode_info.margin * 2) + 1;
         char *barcode_line = malloc(sizeof(char) * (barcode_width));
         if (barcode_line == NULL) {
                 fprintf(stderr, "ERRO: Falha na alocação de memória.\n");
                 goto cleanup;
         }
         int j = 0;
-        for (int i = barcodeInfo.margin; i < strlen(file_line) - barcodeInfo.margin; i++) {
+        for (int i = barcode_info.margin; i < strlen(file_line) - barcode_info.margin; i++) {
                 barcode_line[j] = file_line[i];
                 j++;
         }
@@ -88,7 +89,7 @@ int main(const int argc, char *argv[]) {
 
         for (int i = 0; i < barcode_line[i] != '\0'; i++) {
                 if (barcode_line[i] == '0') {
-                        barcodeInfo.area = i;
+                        barcode_info.area = i;
                         break;
                 }
         }
@@ -99,7 +100,7 @@ int main(const int argc, char *argv[]) {
                 goto cleanup;
         }
         for (int i = 0; i < CODE_LEN; i++) {
-                ean8_identifier[i] = barcode_line[i * barcodeInfo.area];
+                ean8_identifier[i] = barcode_line[i * barcode_info.area];
         }
 
         free(barcode_line);
@@ -133,7 +134,7 @@ int main(const int argc, char *argv[]) {
                         if (strcmp(buffer, l_codes[k]) == 0) {
                                 char c = k + '0';
                                 char temp_c[2] = {c, '\0'};
-                                strcat(barcodeInfo.identifier, temp_c);
+                                strcat(barcode_info.identifier, temp_c);
                         }
                 }
         }
@@ -148,22 +149,22 @@ int main(const int argc, char *argv[]) {
                         if (strcmp(buffer, r_codes[k]) == 0) {
                                 char c = k + '0';
                                 char temp_c[2] = {c, '\0'};
-                                strcat(barcodeInfo.identifier, temp_c);
+                                strcat(barcode_info.identifier, temp_c);
                         }
                 }
         }
-        barcodeInfo.identifier[8] = '\0';
+        barcode_info.identifier[8] = '\0';
 
 
-        char verifier = get_verification_digit(barcodeInfo.identifier);
-        if (verifier != barcodeInfo.identifier[7]) {
+        char verifier = get_verification_digit(barcode_info.identifier);
+        if (verifier != barcode_info.identifier[7]) {
                 fprintf(stderr, "ERRO: Identificador %s de %s é inválido.\n "
-                                "Para ser válido, o último dígito deveria ser %d.\n", barcodeInfo.identifier, argv[1], verifier);
+                                "Para ser válido, o último dígito deveria ser %d.\n", barcode_info.identifier, argv[1], verifier);
                 goto cleanup;
         }
 
 
-        printf("Identificador: %s\n", barcodeInfo.identifier);
+        printf("Identificador: %s\n", barcode_info.identifier);
 
         free(ean8_identifier);
         return 0;

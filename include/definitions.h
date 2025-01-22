@@ -19,14 +19,15 @@ typedef struct {
     int area;
     int height;
     char identifier[9];
-    char title[30];
+    char title[21];
 } GenInfo;
 
 typedef struct {
     int width;
     int height;
     char filename[43];
-    char *code;
+    char* ean8_code;
+    char* barcode_line;
 } PBMImage;
 
 #endif //DEFINITIONS_H
