@@ -15,19 +15,19 @@ extern const char l_codes[10][8];
 
 // Structs
 typedef struct {
-    int margin;
-    int area;
-    int height;
-    char identifier[9];
-    char title[21];
+        int margin;
+        int area;
+        int height;
+        char identifier[9];
+        char title[21];
 } GenInfo;
 
 typedef struct {
-    int width;
-    int height;
-    char filename[43];
-    char* ean8_code;
-    char* barcode_line;
+        int width;
+        int height;
+        char filename[43];
+        char *ean8_code;
+        char *barcode_line;
 } PBMImage;
 
 #endif //DEFINITIONS_H

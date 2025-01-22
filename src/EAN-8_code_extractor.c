@@ -29,17 +29,17 @@ int main(const int argc, char *argv[]) {
         PBMImage pbm_image = get_pbm_info(input_file);
 
         if (strncmp(pbm_image.ean8_code, "101", 3) != 0 ||
-                strncmp(pbm_image.ean8_code + CODE_LEN - 3, "101", 3) != 0) {
+            strncmp(pbm_image.ean8_code + CODE_LEN - 3, "101", 3) != 0) {
                 fprintf(stderr, "ERRO: Tipo de arquivo inválido.\n"
-                                "O início ou o fim do código de barras não foi encontrado. "
-                                "O código de barras deve iniciar e finalizar com '101'.\n");
+                        "O início ou o fim do código de barras não foi encontrado. "
+                        "O código de barras deve iniciar e finalizar com '101'.\n");
                 goto cleanup;
         }
 
         if (strncmp(pbm_image.ean8_code + 31, "01010", 3) != 0) {
                 fprintf(stderr, "ERRO: Tipo de arquivo inválido.\n"
-                                "O meio do código de barras não foi encontrado. "
-                                "O código de barras deve conter '01010' no meio.\n");
+                        "O meio do código de barras não foi encontrado. "
+                        "O código de barras deve conter '01010' no meio.\n");
                 goto cleanup;
         }
 
@@ -48,7 +48,7 @@ int main(const int argc, char *argv[]) {
         char verifier = get_verification_digit(identifier);
         if (verifier != identifier[7]) {
                 fprintf(stderr, "ERRO: Identificador %s de %s é inválido.\n "
-                                "Para ser válido, o último dígito deveria ser %d.\n", identifier, argv[1], verifier);
+                        "Para ser válido, o último dígito deveria ser %d.\n", identifier, argv[1], verifier);
                 goto cleanup;
         }
 
@@ -58,7 +58,7 @@ int main(const int argc, char *argv[]) {
         if (pbm_image.ean8_code) free(pbm_image.ean8_code);
         return 0;
 
-        cleanup:
+cleanup:
         if (pbm_image.ean8_code) free(pbm_image.ean8_code);
         return 1;
 }
