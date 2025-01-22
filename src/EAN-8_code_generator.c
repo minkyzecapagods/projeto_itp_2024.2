@@ -3,88 +3,9 @@
 #include <string.h>
 #include <unistd.h>
 
-void usage(){
-        printf("GERADOR DE CÓDIGO DE BARRAS\n");
-        printf("\tGera um arquivo PBM na pasta 'barcode-output' com base na entrada fornecida.\n");
-        printf("Uso:\n");
-        printf("\t./EAN-8_code_generator <opção> ... <identificador>\n");
-        printf("Opções:\n");
-        printf("\t-m <pixels>\n");
-        printf("\t\tPermite ao usuário definir a margem de acordo com o valor inteiro fornecido em <pixels>\n");
-        printf("\t\tSem o parâmetro -m, a margem será de 4px.\n");
-        printf("\t-a <pixels>\n");
-        printf("\t\tPermite ao usuário definir a área do código de barras de acordo com o valor inteiro fornecido em <pixels>\n");
-        printf("\t\tSem o parâmetro -a, a área será de 3px.\n");
-        printf("\t-h <pixels>\n");
-        printf("\t\tPermite ao usuário definir a altura do código de barras de acordo com o valor inteiro fornecido em <pixels>\n");
-        printf("\t\tSem o parâmetro -h, a altura será de 50px.\n");
-        printf("\t-n <nome_arquivo>\n");
-        printf("\t\tPermite ao usuário definir o nome do arquivo de saída de acordo com o valor fornecido em <nome_arquivo>\n");
-        printf("\t\tSem o parâmetro -n, o nome será o identificador.\n");
-}
-
-typedef struct {
-        int width;
-        int height;
-        char filename[43];
-        char *code;
-} PBMImage;
-
-typedef struct {
-        int margin;
-        int area;
-        int height;
-        char identifier[9];
-        char title[21];
-} GenInfo;
-
-// Função para calcular o dígito verificador
-
-char get_verification_digit(const char *id) {
-        int sum = 0;
-        for (int i = 1; i < 8; i++) {
-                sum += (id[i-1] - '0') * ((i % 2 == 1) ? 3 : 1);
-        }
-        int next_mul_ten = ((sum + 9) / 10) * 10; // Encontra o próximo múltiplo de 10
-        int digit = next_mul_ten - sum;
-        return digit + '0';
-}
-
-char* to_ean8(const char *id) {
-        const char l_codes[10][8] = {
-                "0001101", "0011001", "0010011", "0111101", "0100011",
-                "0110001", "0101111", "0111011", "0110111", "0001011"
-        };
-        const char r_codes[10][8] = {
-                "1110010", "1100110", "1101100", "1000010", "1011100",
-                "1001110", "1010000", "1000100", "1001000", "1110100"
-        };
-
-        // Código de início do EAN-8
-        static char code_line[68] = "101";
-        int digit;
-
-        // Processa os primeiros 4 dígitos com L-code
-        for (int i = 0; i < 4; i++) {
-                digit = id[i] - '0';
-                strcat(code_line, l_codes[digit]);
-        }
-
-        // Adiciona o código do meio
-        strcat(code_line, "01010");
-
-        // Processa os últimos 4 dígitos com R-code
-        for (int i = 4; i < 8; i++) {
-                digit = id[i] - '0';
-                strcat(code_line, r_codes[digit]);
-        }
-
-        // Adiciona o código de fim
-        strcat(code_line, "101");
-
-        // Imprime o código de barras traduzido
-        return code_line;
-}
+#include <definitions.h>
+#include <funcs.h>
+#include <io.h>
 
 int main(const int argc, char *argv[]) {
         // 1. Receber um código de 8 dígitos e verificar se ele é válido;
@@ -94,7 +15,7 @@ int main(const int argc, char *argv[]) {
 
         //Ao chamar essa função sem nenhum argumento, exibe o uso no terminal
         if (argc == 1) {
-                usage();
+                generator_usage();
                 return 1;
         }
         if (argc > 10) {
@@ -110,7 +31,7 @@ int main(const int argc, char *argv[]) {
                 switch(opt){
                         case 'h':
                                 num = atoi(optarg);
-                                if(num == 0 || num > 1024) {
+                                if(num == 0 || num > MAX_SIZE) {
                                         fprintf(stderr, "ERRO: Valor inválido para opção '-h'.\n");
                                         return 1;
                                 }
@@ -118,7 +39,7 @@ int main(const int argc, char *argv[]) {
                                 break;
                         case 'm':
                                 num = atoi(optarg);
-                                if(num == 0 || num > 1024) {
+                                if(num == 0 || num > MAX_SIZE) {
                                         fprintf(stderr, "ERRO: Valor inválido para opção '-m'.\n");
                                         return 1;
                                 }
@@ -126,7 +47,7 @@ int main(const int argc, char *argv[]) {
                                 break;
                         case 'a':
                                 num = atoi(optarg);
-                                if(num == 0 || num > 1024) {
+                                if(num == 0 || num > MAX_SIZE) {
                                         fprintf(stderr, "ERRO: Valor inválido para opção '-a'.\n");
                                         return 1;
                                 }
@@ -188,7 +109,7 @@ int main(const int argc, char *argv[]) {
 
         PBMImage pbm_image;
         pbm_image.height  = input.height + (input.margin * 2);
-        pbm_image.width = (67 * input.area) + (input.margin * 2);
+        pbm_image.width = (CODE_LEN * input.area) + (input.margin * 2);
         pbm_image.code = to_ean8(input.identifier);
         sprintf(pbm_image.filename, "%s%s%s", "../barcode-output/", input.title, ".pbm");
 
@@ -220,7 +141,7 @@ int main(const int argc, char *argv[]) {
                 return 1;
         }
 
-        if (pbm_image.height > 1024 || pbm_image.width > 1024) {
+        if (pbm_image.height > MAX_SIZE || pbm_image.width > MAX_SIZE) {
                 fprintf(stderr, "ERRO DE ENTRADA: As dimensões da imagem excedem o limite permitido.\n");
                 return 1;
         }

@@ -7,44 +7,13 @@
 #include <string.h>
 #include <unistd.h>
 
-char get_verification_digit(const char *id) {
-        int sum = 0;
-        for (int i = 1; i < 8; i++) {
-                sum += (id[i-1] - '0') * ((i % 2 == 1) ? 3 : 1);
-        }
-        int next_mul_ten = ((sum + 9) / 10) * 10; // Encontra o próximo múltiplo de 10
-        int digit = next_mul_ten - sum;
-        return digit + '0';
-}
-
-void usage() {
-        printf("LEITOR DE CÓDIGO DE BARRAS\n");
-        printf("\tExtrai o identificador do código de barras no arquivo .pbm informado.\n");
-        printf("\tPara acessar arquivos dentro da pasta 'barcode-output', inserir o caminho '../barcode-output/' antes do nome do arquivo.\n");
-        printf("Uso:\n");
-        printf("\t./EAN-8_code_extractor <nome_do_arquivo>\n");
-}
-
-typedef struct {
-        int margin;
-        int area;
-        int height;
-        char identifier[9];
-        char title[30];
-} GenInfo;
-
+#include <definitions.h>
+#include <funcs.h>
+#include <io.h>
 
 int main(const int argc, char *argv[]) {
-        const char lcodes[10][8] = {
-                "0001101", "0011001", "0010011", "0111101", "0100011",
-                "0110001", "0101111", "0111011", "0110111", "0001011"
-        };
-        const char rcodes[10][8] = {
-                "1110010", "1100110", "1101100", "1000010", "1011100",
-                "1001110", "1010000", "1000100", "1001000", "1110100"
-        };
         if (argc != 2) {
-                usage();
+                extractor_usage();
                 return 1;
         }
         GenInfo barcodeInfo = {-1};
@@ -123,24 +92,23 @@ int main(const int argc, char *argv[]) {
                         break;
                 }
         }
-        const int ean8_length = 67;
 
-        char* ean8_identifier = malloc((sizeof(char) * ean8_length) + 1);
+        char* ean8_identifier = malloc((sizeof(char) * CODE_LEN) + 1);
         if (ean8_identifier == NULL) {
                 fprintf(stderr, "ERRO: Falha na alocação de memória.\n");
                 goto cleanup;
         }
-        for (int i = 0; i < ean8_length; i++) {
+        for (int i = 0; i < CODE_LEN; i++) {
                 ean8_identifier[i] = barcode_line[i * barcodeInfo.area];
         }
 
         free(barcode_line);
         barcode_line = NULL;
 
-        ean8_identifier[ean8_length] = '\0';
+        ean8_identifier[CODE_LEN] = '\0';
 
         if (strncmp(ean8_identifier, "101", 3) != 0 ||
-                strncmp(ean8_identifier + ean8_length - 3, "101", 3) != 0) {
+                strncmp(ean8_identifier + CODE_LEN - 3, "101", 3) != 0) {
                 fprintf(stderr, "ERRO: Tipo de arquivo inválido.\n"
                                 "O início ou o fim do código de barras não foi encontrado. "
                                 "O código de barras deve iniciar e finalizar com '101'.\n");
@@ -162,7 +130,7 @@ int main(const int argc, char *argv[]) {
                         strcat(buffer, temp);
                 }
                 for (int k = 0; k < 10; k++) {
-                        if (strcmp(buffer, lcodes[k]) == 0) {
+                        if (strcmp(buffer, l_codes[k]) == 0) {
                                 char c = k + '0';
                                 char temp_c[2] = {c, '\0'};
                                 strcat(barcodeInfo.identifier, temp_c);
@@ -177,7 +145,7 @@ int main(const int argc, char *argv[]) {
                         strcat(buffer, temp);
                 }
                 for (int k = 0; k < 10; k++) {
-                        if (strcmp(buffer, rcodes[k]) == 0) {
+                        if (strcmp(buffer, r_codes[k]) == 0) {
                                 char c = k + '0';
                                 char temp_c[2] = {c, '\0'};
                                 strcat(barcodeInfo.identifier, temp_c);
