@@ -9,18 +9,18 @@
 #include "../include/definitions.h"
 #include "../include/io.h"
 
-// Função para calcular o dígito verificador
-
+// Função para calcular o dígito verificador.
 char get_verification_digit(const char *id) {
     int sum = 0;
     for (int i = 1; i < 8; i++) {
         sum += (id[i-1] - '0') * ((i % 2 == 1) ? 3 : 1);
     }
-    int next_mul_ten = ((sum + 9) / 10) * 10; // Encontra o próximo múltiplo de 10
+    int next_mul_ten = ((sum + 9) / 10) * 10; // Encontra o próximo múltiplo de 10.
     int digit = next_mul_ten - sum;
     return digit + '0';
 }
 
+// Função que transforma o identificador fornecido em código de barras.
 char* to_ean8(const char *id) {
 
     // Código de início do EAN-8
@@ -45,10 +45,11 @@ char* to_ean8(const char *id) {
     // Adiciona o código de fim
     strcat(code_line, "101");
 
-    // Imprime o código de barras traduzido
+    // Retorna o código de barras traduzido
     return code_line;
 }
 
+// Função para criar um objeto com informações do arquivo a ser gerado, passadas pelo usuário.
 PBMImage create_pbm_info(const GenInfo info) {
     PBMImage pbm_image;
     pbm_image.height  = info.height + (info.margin * 2);
@@ -63,6 +64,7 @@ PBMImage create_pbm_info(const GenInfo info) {
     return pbm_image;
 }
 
+// Função que cria a linha com dígitos 1's na imagem pbm
 char* create_barcode_line(const int area, const int width, char* ean8_code) {
     char* barcode_line = malloc(sizeof(char) * (width + 1));
     if (barcode_line == NULL) {
@@ -70,6 +72,7 @@ char* create_barcode_line(const int area, const int width, char* ean8_code) {
         exit(1);
     }
 
+    // Loop que expande o código de barras conforme a área de cada barra.
     for (int i = 0; i < CODE_LEN; i++) {
         for (int j = 0; j < area; j++) {
             barcode_line[i * area + j] = ean8_code[i];
@@ -79,6 +82,7 @@ char* create_barcode_line(const int area, const int width, char* ean8_code) {
     return barcode_line;
 }
 
+// Função que captura as informações do código de barras na imagem pbm.
 PBMImage get_pbm_info(FILE* input_file) {
 
     PBMImage pbm_image = {check_barcode_file(input_file)};
@@ -90,6 +94,7 @@ PBMImage get_pbm_info(FILE* input_file) {
     }
 
     int margin = -1;
+    // Loop para encontrar o primeiro dígito 1 na imagem, significando que o código de barras iniciou.
     while (margin == -1) {
         if (fscanf(input_file, "%s", pbm_image.barcode_line) == EOF) break;
         for (int i = 0; i < pbm_image.width; i++) {
@@ -107,12 +112,14 @@ PBMImage get_pbm_info(FILE* input_file) {
 
     pbm_image.barcode_line[pbm_image.width] = '\0';
     const int barcode_width = pbm_image.width - (margin * 2) + 1;
+    // Inicialização de um array para armazenar a linha que contém o código de barras sem a margem.
     char *no_margin_line = malloc(sizeof(char) * (barcode_width));
     if (no_margin_line == NULL) {
         fprintf(stderr, "ERRO: Falha na alocação de memória.\n");
         goto cleanup;
     }
     int j = 0;
+    // Loop para tirar a margem esquerda e direita do código de barras.
     for (int i = margin; i < pbm_image.width - margin; i++) {
         no_margin_line[j] = pbm_image.barcode_line[i];
         j++;
@@ -138,6 +145,7 @@ PBMImage get_pbm_info(FILE* input_file) {
 
 char* from_barcode(char* barcode) {
     int area = 0;
+    // Loop para calcular a área de cada barra.
     for (int i = 0; i < barcode[i] != '\0'; i++) {
         if (barcode[i] == '0') {
             area = i;
@@ -150,6 +158,7 @@ char* from_barcode(char* barcode) {
         free(barcode);
         exit(1);
     }
+    // Loop para desfazer a expansão das barras pela área.
     for (int i = 0; i < CODE_LEN; i++) {
         ean8_identifier[i] = barcode[i * area];
     }
@@ -161,16 +170,21 @@ char* from_barcode(char* barcode) {
     return ean8_identifier;
 }
 
+// Função que transforma o código de barras em um identificador.
 char* to_identifier(char* ean8_code) {
   static char identifier[9];
     char buffer[9];
+    // Traduzindo lado esquerdo do código a partir dos L-codes
+    // Loop começando no 4º índice para pular os dígitos iniciais "101".
     for (int i = 3; i < 32; i += 7) {
+        // Limpando o conteúdo do buffer para ele não interferir em iterações subsequentes.
         memset(buffer, 0, sizeof(buffer));
         for (int j = 0; j < 7; j++) {
             char temp[2] = {ean8_code[i + j], '\0'};
             strcat(buffer, temp);
         }
         for (int k = 0; k < 10; k++) {
+            // Obtendo o dígito correspondente ao trecho do código atual do código de barras.
             if (strcmp(buffer, l_codes[k]) == 0) {
                 char c = k + '0';
                 char temp_c[2] = {c, '\0'};
@@ -179,6 +193,7 @@ char* to_identifier(char* ean8_code) {
         }
     }
 
+    // Traduzindo lado esquerdo do código a partir dos R-codes
     for (int i = 36; i < 64; i += 7) {
         memset(buffer, 0, sizeof(buffer));
         for (int j = 0; j < 7; j++) {

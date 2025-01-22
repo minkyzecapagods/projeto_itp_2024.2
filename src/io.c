@@ -9,11 +9,22 @@
 #include "../include/definitions.h"
 
 void generator_usage() {
-    printf("LEITOR DE CÓDIGO DE BARRAS\n");
-    printf("\tExtrai o identificador do código de barras no arquivo .pbm informado.\n");
-    printf("\tPara acessar arquivos dentro da pasta 'barcode-output', inserir o caminho '../barcode-output/' antes do nome do arquivo.\n");
+    printf("\tGera um arquivo PBM baseado no input do usuário.\n");
     printf("Uso:\n");
-    printf("\t./EAN-8_code_extractor <nome_do_arquivo>\n");
+    printf("\t./EAN-8_code_generator <opção> ... <identificador>\n");
+    printf("Ooções:\n");
+    printf("\t-m <pixels>\n");
+    printf("\t\tdeixa o usuário definir a margem baseado no input em <pixels>\n");
+    printf("\t\tsem -m, a margem será de 4px.\n");
+    printf("\t-a <pixels>\n");
+    printf("\t\tdeixa o usuário definir a área das barras baseada no input em <pixels>\n");
+    printf("\t\tsem -a, a área será de 3px.\n");
+    printf("\t-h <pixels>\n");
+    printf("\t\tdeixa o usuário definir a altura do código de barras baseada no input em <pixels>\n");
+    printf("\t\tserá -h, a altura será de 50px.\n");
+    printf("\t-n <file_name>\n");
+    printf("\t\tdeixa o usuário definir o nome do arquivo .pbm gerado baseado no input <file_name>\n");
+    printf("\t\tsem -n, o nome do arquivo será o identificador fornecido.\n");
 }
 
 void extractor_usage() {
@@ -59,6 +70,7 @@ int check_flags(char* optarg, char* flag) {
     return num;
 }
 
+// Função para checar os possíveis erros que podem existir no arquivo pbm.
 int check_barcode_file(FILE* filename) {
     char first_line[3];
     char st1[5];
@@ -87,6 +99,7 @@ int check_barcode_file(FILE* filename) {
     exit(1);
 }
 
+// Função para criar o arquivo pbm.
 void create_pbm_image(PBMImage pbm_image, int height, int margin) {
         // margin_line é a linha que servirá como margem superior e inferior no arquivo PBM
         char* margin_line = malloc(sizeof(char) * (pbm_image.width + 1));
