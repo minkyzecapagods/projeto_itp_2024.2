@@ -114,22 +114,6 @@ int main(const int argc, char *argv[]) {
 
         PBMImage pbm_image = create_pbm_info(input);
 
-        // pbm_image.barcode_line é a codificação das barras expandida baseada no parâmetro área
-        char* barcode_line = malloc(sizeof(char) * (pbm_image.width + 1));
-        if (pbm_image.barcode_line == NULL) {
-                fprintf(stderr, "ERRO: Falha na alocação de memória.\n");
-                return 1;
-        }
-        pbm_image.barcode_line = barcode_line;
-
-        // Expandindo o código de barras conforme a área
-        for (int i = 0; i < strlen(pbm_image.ean8_code); i++) {
-                for (int j = 0; j < input.area; j++) {
-                        pbm_image.barcode_line[i * input.area + j] = pbm_image.ean8_code[i];
-                }
-        }
-        pbm_image.barcode_line[pbm_image.width] = '\0';
-
         // margin_line é a linha que servirá como margem superior e inferior no arquivo PBM
         char* margin_line = malloc(sizeof(char) * (pbm_image.width + 1));
         if (margin_line == NULL) {

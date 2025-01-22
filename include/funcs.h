@@ -15,4 +15,6 @@ char* to_ean8(const char *id);
 
 PBMImage create_pbm_info(const GenInfo info);
 
+char* create_barcode_line(const int area, const int width, char* ean8_code);
+
 #endif //FUNCS_H

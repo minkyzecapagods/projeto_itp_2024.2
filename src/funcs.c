@@ -59,6 +59,22 @@ PBMImage create_pbm_info(const GenInfo info) {
     check_file_exists(pbm_image.filename);
 
     pbm_image.ean8_code = to_ean8(info.identifier);
+    pbm_image.barcode_line = create_barcode_line(info.area, pbm_image.width, pbm_image.ean8_code);
     return pbm_image;
 }
 
+char* create_barcode_line(const int area, const int width, char* ean8_code) {
+    char* barcode_line = malloc(sizeof(char) * (width + 1));
+    if (barcode_line == NULL) {
+        fprintf(stderr, "ERRO: Falha na alocação de memória.\n");
+        exit(1);
+    }
+
+    for (int i = 0; i < CODE_LEN; i++) {
+        for (int j = 0; j < area; j++) {
+            barcode_line[i * area + j] = ean8_code[i];
+        }
+    }
+    barcode_line[width] = '\0';
+    return barcode_line;
+}
