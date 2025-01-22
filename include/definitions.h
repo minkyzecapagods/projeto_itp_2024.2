@@ -25,7 +25,7 @@ typedef struct {
 typedef struct {
         int width;
         int height;
-        char filename[43];
+        char filename[41];
         char *ean8_code;
         char *barcode_line;
 } PBMImage;

@@ -19,7 +19,7 @@ int main(const int argc, char *argv[]) {
                         "ERRO DE ENTRADA: Muitos argumentos fornecidos. Verifique a quantidade correta de opções.\n");
                 return 1;
         }
-        GenInfo input = {4, 3, 50, 'e'};
+        GenInfo input = {4, 3, 50, "e"};
         int opt;
 
         // Loop para lidar com os argumentos parseados
