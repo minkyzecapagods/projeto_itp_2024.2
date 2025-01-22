@@ -147,7 +147,7 @@ int main(const int argc, char *argv[]) {
                                 fprintf(stderr,"ERRO DE ENTRADA: '-%c' é uma opção inválida.\n", optopt);
                                 return 1;
                         default:
-                                fprintf(stderr, "ERRO: ERRO inesperado.\n");
+                                fprintf(stderr, "ERRO: Erro inesperado.\n");
                                 return 1;
                 }
         }
