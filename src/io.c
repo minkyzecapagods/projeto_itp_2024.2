@@ -67,20 +67,24 @@ int check_barcode_file(FILE* filename) {
     if (strcmp(first_line, "P1") != 0) {
         fprintf(stderr,"ERRO: Tipo de arquivo inválido.\n"
                        "O arquivo não é do tipo P1.\n");
-        if (filename) if (fclose(filename) == EOF) fprintf(stderr, "ERRO: Erro crítico ao fechar o arquivo.\n");
+        goto cleanup;
     }
     if (fscanf(filename, "%s %s", st1, st2) == EOF) {
         fprintf(stderr,"ERRO: Tipo de arquivo inválido.\n"
                 "Não foi possível ler as dimensões do código de barras.\n");
-        if (filename) if (fclose(filename) == EOF) fprintf(stderr, "ERRO: Erro crítico ao fechar o arquivo.\n");
+        goto cleanup;
     };
     int width = atoi(st1);
     if (width <= 0 || width > MAX_SIZE) {
         fprintf(stderr,"ERRO: Tipo de arquivo inválido.\n"
                "O arquivo é muito grande.\n");
-        if (filename) if (fclose(filename) == EOF) fprintf(stderr, "ERRO: Erro crítico ao fechar o arquivo.\n");
+        goto cleanup;
     }
     return width;
+
+    cleanup:
+    if (filename) if (fclose(filename) == EOF) fprintf(stderr, "ERRO: Erro crítico ao fechar o arquivo.\n");
+    exit(1);
 }
 
 void create_pbm_image(PBMImage pbm_image, int height, int margin) {

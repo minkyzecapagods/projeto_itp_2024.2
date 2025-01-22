@@ -120,7 +120,10 @@ PBMImage get_pbm_info(FILE* input_file) {
 
     free (pbm_image.barcode_line);
     pbm_image.barcode_line = NULL;
-    if (fclose(input_file) == EOF) fprintf(stderr, "ERRO: Erro crítico ao fechar o arquivo.\n");
+    if (fclose(input_file) == EOF) {
+      fprintf(stderr, "ERRO: Erro crítico ao fechar o arquivo.\n");
+      exit(1);
+    }
     input_file = NULL;
 
     pbm_image.ean8_code = from_barcode(no_margin_line);
