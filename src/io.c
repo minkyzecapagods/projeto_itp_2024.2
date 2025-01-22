@@ -3,6 +3,7 @@
 //
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "../include/io.h"
 #include "../include/definitions.h"
@@ -46,4 +47,81 @@ void check_file_exists(char* filename) {
             while ((r = getchar()) != '\n' && r != EOF);
         }
     }
+}
+
+int check_barcode_file(FILE* filename) {
+    char first_line[3];
+    char st1[5];
+    char st2[5];
+    fscanf(filename, "%s", first_line);
+    if (strcmp(first_line, "P1") != 0) {
+        fprintf(stderr,"ERRO: Tipo de arquivo inválido.\n"
+                       "O arquivo não é do tipo P1.\n");
+        if (filename) if (fclose(filename) == EOF) fprintf(stderr, "ERRO: Erro crítico ao fechar o arquivo.\n");
+    }
+    if (fscanf(filename, "%s %s", st1, st2) == EOF) {
+        fprintf(stderr,"ERRO: Tipo de arquivo inválido.\n"
+                "Não foi possível ler as dimensões do código de barras.\n");
+        if (filename) if (fclose(filename) == EOF) fprintf(stderr, "ERRO: Erro crítico ao fechar o arquivo.\n");
+    };
+    int width = atoi(st1);
+    if (width <= 0 || width > MAX_SIZE) {
+        fprintf(stderr,"ERRO: Tipo de arquivo inválido.\n"
+               "O arquivo é muito grande.\n");
+        if (filename) if (fclose(filename) == EOF) fprintf(stderr, "ERRO: Erro crítico ao fechar o arquivo.\n");
+    }
+    return width;
+}
+
+void create_pbm_image(PBMImage pbm_image, int height, int margin) {
+        // margin_line é a linha que servirá como margem superior e inferior no arquivo PBM
+        char* margin_line = malloc(sizeof(char) * (pbm_image.width + 1));
+        if (margin_line == NULL) {
+                fprintf(stderr, "ERRO: Falha na alocação de memória.\n");
+                free(pbm_image.barcode_line);
+                exit(1);
+        }
+        for (int i = 0; i < pbm_image.width; i++) margin_line[i] = '0';
+        margin_line[pbm_image.width] = '\0';
+
+        // margin_column representa as margens laterais do arquivo PBM
+        char* margin_column = malloc(sizeof(char) * (margin + 1));
+        if (margin_column == NULL) {
+                fprintf(stderr, "ERRO: Falha na alocação de memória.\n");
+                free(pbm_image.barcode_line);
+                free(margin_line);
+                exit(1);
+        }
+        for (int i = 0; i < margin; i++) margin_column[i] = '0';
+
+
+        FILE *output_file = fopen(pbm_image.filename, "w");
+        if (output_file == NULL) {
+                fprintf(stderr, "ERRO: Algo deu errado ao abrir o arquivo.\n");
+                free(pbm_image.barcode_line);
+                free(margin_line);
+                free(margin_column);
+                exit(1);
+        }
+
+        fprintf(output_file, "P1\n");
+        fprintf(output_file, "%d %d\n", pbm_image.width, pbm_image.height);
+
+        // Imprimindo margens superiores
+        for (int i = 0; i < margin; i++) fprintf(output_file, "%s\n", margin_line);
+
+        // Imprimindo os códigos já expandidos e com as margens, com a altura informada
+        for (int i = 0; i < height; i++) {
+                fprintf(output_file, "%s", margin_column);
+                fprintf(output_file, "%s", pbm_image.barcode_line);
+                fprintf(output_file,"%s\n", margin_column);
+        }
+
+        // Imprimindo margens inferiores
+        for (int i = 0; i < margin; i++) fprintf(output_file,"%s\n", margin_line);
+
+        fclose(output_file);
+        free(margin_column);
+        free(pbm_image.barcode_line);
+        free(margin_line);
 }

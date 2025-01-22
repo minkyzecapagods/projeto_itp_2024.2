@@ -79,55 +79,117 @@ char* create_barcode_line(const int area, const int width, char* ean8_code) {
     return barcode_line;
 }
 
-void create_pbm_image(PBMImage pbm_image, int height, int margin) {
-        // margin_line é a linha que servirá como margem superior e inferior no arquivo PBM
-        char* margin_line = malloc(sizeof(char) * (pbm_image.width + 1));
-        if (margin_line == NULL) {
-                fprintf(stderr, "ERRO: Falha na alocação de memória.\n");
-                free(pbm_image.barcode_line);
-                exit(1);
+PBMImage get_pbm_info(FILE* input_file) {
+
+    PBMImage pbm_image = {check_barcode_file(input_file)};
+
+    pbm_image.barcode_line = malloc(sizeof(char) * pbm_image.width + 1);
+    if (pbm_image.barcode_line == NULL) {
+        fprintf(stderr,"ERRO: Falha na alocação de memória.\n");
+        goto cleanup;
+    }
+
+    int margin = -1;
+    while (margin == -1) {
+        if (fscanf(input_file, "%s", pbm_image.barcode_line) == EOF) break;
+        for (int i = 0; i < pbm_image.width; i++) {
+            if (pbm_image.barcode_line[i] == '1') {
+                margin = i;
+                break;
+            }
         }
-        for (int i = 0; i < pbm_image.width; i++) margin_line[i] = '0';
-        margin_line[pbm_image.width] = '\0';
+    }
+    if (margin == -1) {
+        fprintf(stderr, "ERRO: Tipo de arquivo inválido.\n"
+               "O arquivo está vazio ou não existe código de barras para ser lido.\n");
+        goto cleanup;
+    }
 
-        // margin_column representa as margens laterais do arquivo PBM
-        char* margin_column = malloc(sizeof(char) * (margin + 1));
-        if (margin_column == NULL) {
-                fprintf(stderr, "ERRO: Falha na alocação de memória.\n");
-                free(pbm_image.barcode_line);
-                free(margin_line);
-                exit(1);
+    pbm_image.barcode_line[pbm_image.width] = '\0';
+    const int barcode_width = pbm_image.width - (margin * 2) + 1;
+    char *no_margin_line = malloc(sizeof(char) * (barcode_width));
+    if (no_margin_line == NULL) {
+        fprintf(stderr, "ERRO: Falha na alocação de memória.\n");
+        goto cleanup;
+    }
+    int j = 0;
+    for (int i = margin; i < pbm_image.width - margin; i++) {
+        no_margin_line[j] = pbm_image.barcode_line[i];
+        j++;
+    }
+
+    free (pbm_image.barcode_line);
+    pbm_image.barcode_line = NULL;
+    if (fclose(input_file) == EOF) fprintf(stderr, "ERRO: Erro crítico ao fechar o arquivo.\n");
+    input_file = NULL;
+
+    pbm_image.ean8_code = from_barcode(no_margin_line);
+
+    return pbm_image;
+
+    cleanup:
+      if(pbm_image.barcode_line) free(pbm_image.barcode_line);
+      if (fclose(input_file) == EOF) fprintf(stderr, "ERRO: Erro crítico ao fechar o arquivo.\n");
+      exit(1);
+}
+
+char* from_barcode(char* barcode) {
+    int area = 0;
+    for (int i = 0; i < barcode[i] != '\0'; i++) {
+        if (barcode[i] == '0') {
+            area = i;
+            break;
         }
-        for (int i = 0; i < margin; i++) margin_column[i] = '0';
+    }
+    char* ean8_identifier = malloc((sizeof(char) * CODE_LEN) + 1);
+    if (ean8_identifier == NULL) {
+        fprintf(stderr, "ERRO: Falha na alocação de memória.\n");
+        free(barcode);
+        exit(1);
+    }
+    for (int i = 0; i < CODE_LEN; i++) {
+        ean8_identifier[i] = barcode[i * area];
+    }
+    ean8_identifier[CODE_LEN] = '\0';
 
+    free(barcode);
+    barcode = NULL;
 
-        FILE *output_file = fopen(pbm_image.filename, "w");
-        if (output_file == NULL) {
-                fprintf(stderr, "ERRO: Algo deu errado ao abrir o arquivo.\n");
-                free(pbm_image.barcode_line);
-                free(margin_line);
-                free(margin_column);
-                exit(1);
+    return ean8_identifier;
+}
+
+char* to_identifier(char* ean8_code) {
+  static char identifier[9];
+    char buffer[9];
+    for (int i = 3; i < 32; i += 7) {
+        memset(buffer, 0, sizeof(buffer));
+        for (int j = 0; j < 7; j++) {
+            char temp[2] = {ean8_code[i + j], '\0'};
+            strcat(buffer, temp);
         }
-
-        fprintf(output_file, "P1\n");
-        fprintf(output_file, "%d %d\n", pbm_image.width, pbm_image.height);
-
-        // Imprimindo margens superiores
-        for (int i = 0; i < margin; i++) fprintf(output_file, "%s\n", margin_line);
-
-        // Imprimindo os códigos já expandidos e com as margens, com a altura informada
-        for (int i = 0; i < height; i++) {
-                fprintf(output_file, "%s", margin_column);
-                fprintf(output_file, "%s", pbm_image.barcode_line);
-                fprintf(output_file,"%s\n", margin_column);
+        for (int k = 0; k < 10; k++) {
+            if (strcmp(buffer, l_codes[k]) == 0) {
+                char c = k + '0';
+                char temp_c[2] = {c, '\0'};
+                strcat(identifier, temp_c);
+            }
         }
+    }
 
-        // Imprimindo margens inferiores
-        for (int i = 0; i < margin; i++) fprintf(output_file,"%s\n", margin_line);
-
-        fclose(output_file);
-        free(margin_column);
-        free(pbm_image.barcode_line);
-        free(margin_line);
+    for (int i = 36; i < 64; i += 7) {
+        memset(buffer, 0, sizeof(buffer));
+        for (int j = 0; j < 7; j++) {
+            char temp[2] = {ean8_code[i + j], '\0'};
+            strcat(buffer, temp);
+        }
+        for (int k = 0; k < 10; k++) {
+            if (strcmp(buffer, r_codes[k]) == 0) {
+                char c = k + '0';
+                char temp_c[2] = {c, '\0'};
+                strcat(identifier, temp_c);
+            }
+        }
+    }
+    identifier[8] = '\0';
+    return identifier;
 }
