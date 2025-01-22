@@ -22,11 +22,14 @@ int main(const int argc, char *argv[]) {
                 fprintf(stderr, "ERRO DE ENTRADA: Muitos argumentos fornecidos. Verifique a quantidade correta de opções.\n");
                 return 1;
         }
-        GenInfo input = {4, 3, 50, 'e'};
+        GenInfo input = {
+                4,
+                3,
+                50,
+                "e"};
         int opt;
-        //Lida com os argumentos parseados
-        //OBS: preciso trocar o atoi por strtol e considerar reportar erros
 
+        //Lida com os argumentos parseados
         while ((opt = getopt(argc, argv, ":m:a:h:n:")) != -1) {
                 switch(opt){
                         case 'h':
@@ -57,6 +60,7 @@ int main(const int argc, char *argv[]) {
                                 return 1;
                 }
         }
+
         //Verifica se o código de barra está sendo parseado
         if (optind < argc) {
                 for(int i = optind; i < argc; i++) {

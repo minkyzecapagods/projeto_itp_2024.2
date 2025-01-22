@@ -56,7 +56,7 @@ PBMImage create_pbm_info(const GenInfo info) {
     pbm_image.width = (CODE_LEN * info.area) + (info.margin * 2);
     check_size(pbm_image.width, pbm_image.height);
 
-    sprintf(pbm_image.filename, "%s%s%s", "../barcode-output/", info.title, ".pbm");
+    sprintf(pbm_image.filename, "%s%s%s", "barcode-output/", info.title, ".pbm");
     check_file_exists(pbm_image.filename);
 
     pbm_image.ean8_code = to_ean8(info.identifier);
@@ -146,7 +146,7 @@ PBMImage get_pbm_info(FILE* input_file) {
 char* from_barcode(char* barcode) {
     int area = 0;
     // Loop para calcular a área de cada barra.
-    for (int i = 0; i < barcode[i] != '\0'; i++) {
+    for (int i = 0; (i < barcode[i]) != '\0'; i++) {
         if (barcode[i] == '0') {
             area = i;
             break;

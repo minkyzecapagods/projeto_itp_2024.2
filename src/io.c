@@ -9,10 +9,11 @@
 #include "../include/definitions.h"
 
 void generator_usage() {
-    printf("\tGera um arquivo PBM baseado no input do usuário.\n");
+    printf("GERADOR DE CÓDIGO DE BARRAS\n");
+    printf("\tGera um arquivo PBM na pasta barcode-output baseado no input do usuário.\n");
     printf("Uso:\n");
-    printf("\t./EAN-8_code_generator <opção> ... <identificador>\n");
-    printf("Ooções:\n");
+    printf("\t./gen <opção> ... <identificador>\n");
+    printf("Opções:\n");
     printf("\t-m <pixels>\n");
     printf("\t\tdeixa o usuário definir a margem baseado no input em <pixels>\n");
     printf("\t\tsem -m, a margem será de 4px.\n");
@@ -30,9 +31,9 @@ void generator_usage() {
 void extractor_usage() {
     printf("LEITOR DE CÓDIGO DE BARRAS\n");
     printf("\tExtrai o identificador do código de barras no arquivo .pbm informado.\n");
-    printf("\tPara acessar arquivos dentro da pasta 'barcode-output', inserir o caminho '../barcode-output/' antes do nome do arquivo.\n");
+    printf("\tPara acessar arquivos dentro da pasta 'barcode-output', inserir o caminho 'barcode-output/' antes do nome do arquivo.\n");
     printf("Uso:\n");
-    printf("\t./EAN-8_code_extractor <nome_do_arquivo>\n");
+    printf("\t./ext <nome_do_arquivo>\n");
 }
 
 void check_size(int width, int height) {
@@ -61,9 +62,8 @@ void check_file_exists(char* filename) {
 }
 
 int check_flags(char* optarg, char* flag) {
-    char *endptr;
-    int num = (int)strtol(optarg, &endptr, 10);
-    if(num < 0 || num > MAX_SIZE || *endptr == '\0') {
+    int num = atoi(optarg);
+    if(num < 0 || num > MAX_SIZE) {
         fprintf(stderr, "ERRO: Valor inválido para opção '%s'.\n", flag);
         exit(1);
     }
