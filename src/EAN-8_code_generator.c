@@ -23,35 +23,20 @@ int main(const int argc, char *argv[]) {
                 return 1;
         }
         GenInfo input = {4, 3, 50, 'e'};
-        int opt, num;
+        int opt;
         //Lida com os argumentos parseados
         //OBS: preciso trocar o atoi por strtol e considerar reportar erros
 
         while ((opt = getopt(argc, argv, ":m:a:h:n:")) != -1) {
                 switch(opt){
                         case 'h':
-                                num = atoi(optarg);
-                                if(num == 0 || num > MAX_SIZE) {
-                                        fprintf(stderr, "ERRO: Valor inválido para opção '-h'.\n");
-                                        return 1;
-                                }
-                                input.height = atoi(optarg);
+                                input.height = check_flags(optarg, "-h");
                                 break;
                         case 'm':
-                                num = atoi(optarg);
-                                if(num == 0 || num > MAX_SIZE) {
-                                        fprintf(stderr, "ERRO: Valor inválido para opção '-m'.\n");
-                                        return 1;
-                                }
-                                input.margin = atoi(optarg);
+                                input.margin = check_flags(optarg, "-m");
                                 break;
                         case 'a':
-                                num = atoi(optarg);
-                                if(num == 0 || num > MAX_SIZE) {
-                                        fprintf(stderr, "ERRO: Valor inválido para opção '-a'.\n");
-                                        return 1;
-                                }
-                                input.area = atoi(optarg);
+                                input.area = check_flags(optarg, "-a");
                                 break;
                         case 'n':
                                 if (strlen(optarg) > 20) {
@@ -82,8 +67,9 @@ int main(const int argc, char *argv[]) {
                         if (input.title[0] == '\0') {
                                 strcpy(input.title, argv[i]);
                         }
-                        int num_identifier = atoi(argv[i]);
-                        if (num_identifier > 0) {
+                        char *endptr;
+                        int num_identifier = (int)strtol(argv[i], &endptr, 10);
+                        if (num_identifier > 0 && *endptr == '\0') {
                                 if (input.identifier[0] == 'e') {
                                         for (int j = 7; j > -1; j--) {
                                                 char id = (num_identifier % 10) + '0';

@@ -49,6 +49,16 @@ void check_file_exists(char* filename) {
     }
 }
 
+int check_flags(char* optarg, char* flag) {
+    char *endptr;
+    int num = (int)strtol(optarg, &endptr, 10);
+    if(num < 0 || num > MAX_SIZE || *endptr == '\0') {
+        fprintf(stderr, "ERRO: Valor inválido para opção '%s'.\n", flag);
+        exit(1);
+    }
+    return num;
+}
+
 int check_barcode_file(FILE* filename) {
     char first_line[3];
     char st1[5];
