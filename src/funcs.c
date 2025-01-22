@@ -78,3 +78,56 @@ char* create_barcode_line(const int area, const int width, char* ean8_code) {
     barcode_line[width] = '\0';
     return barcode_line;
 }
+
+void create_pbm_image(PBMImage pbm_image, int height, int margin) {
+        // margin_line é a linha que servirá como margem superior e inferior no arquivo PBM
+        char* margin_line = malloc(sizeof(char) * (pbm_image.width + 1));
+        if (margin_line == NULL) {
+                fprintf(stderr, "ERRO: Falha na alocação de memória.\n");
+                free(pbm_image.barcode_line);
+                exit(1);
+        }
+        for (int i = 0; i < pbm_image.width; i++) margin_line[i] = '0';
+        margin_line[pbm_image.width] = '\0';
+
+        // margin_column representa as margens laterais do arquivo PBM
+        char* margin_column = malloc(sizeof(char) * (margin + 1));
+        if (margin_column == NULL) {
+                fprintf(stderr, "ERRO: Falha na alocação de memória.\n");
+                free(pbm_image.barcode_line);
+                free(margin_line);
+                exit(1);
+        }
+        for (int i = 0; i < margin; i++) margin_column[i] = '0';
+
+
+        FILE *output_file = fopen(pbm_image.filename, "w");
+        if (output_file == NULL) {
+                fprintf(stderr, "ERRO: Algo deu errado ao abrir o arquivo.\n");
+                free(pbm_image.barcode_line);
+                free(margin_line);
+                free(margin_column);
+                exit(1);
+        }
+
+        fprintf(output_file, "P1\n");
+        fprintf(output_file, "%d %d\n", pbm_image.width, pbm_image.height);
+
+        // Imprimindo margens superiores
+        for (int i = 0; i < margin; i++) fprintf(output_file, "%s\n", margin_line);
+
+        // Imprimindo os códigos já expandidos e com as margens, com a altura informada
+        for (int i = 0; i < height; i++) {
+                fprintf(output_file, "%s", margin_column);
+                fprintf(output_file, "%s", pbm_image.barcode_line);
+                fprintf(output_file,"%s\n", margin_column);
+        }
+
+        // Imprimindo margens inferiores
+        for (int i = 0; i < margin; i++) fprintf(output_file,"%s\n", margin_line);
+
+        fclose(output_file);
+        free(margin_column);
+        free(pbm_image.barcode_line);
+        free(margin_line);
+}

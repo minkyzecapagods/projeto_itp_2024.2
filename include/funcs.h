@@ -17,4 +17,6 @@ PBMImage create_pbm_info(const GenInfo info);
 
 char* create_barcode_line(const int area, const int width, char* ean8_code);
 
+void create_pbm_image(PBMImage pbm_image, int height, int margin);
+
 #endif //FUNCS_H
