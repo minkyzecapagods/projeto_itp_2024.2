@@ -193,9 +193,21 @@ int main(const int argc, char *argv[]) {
         sprintf(pbm_image.filename, "%s%s%s", "../barcode-output/", input.title, ".pbm");
 
         if (fopen(pbm_image.filename, "r") != NULL) {
-                fprintf(stderr, "ERRO DE ENTRADA: O arquivo '%s'.pbm já existe.\n", pbm_image.filename);
-                return 1;
+                fprintf(stderr, "AVISO O arquivo '%s' já existe.\n"
+                                "Deseja sobrescrever a pasta existente? (s/n) ", pbm_image.filename);
+                char r;
+                while (1) {
+                        r = getchar();
+                        if (r == 's' || r == 'S') break;
+                        if (r == 'n' || r == 'N') {
+                                printf("Operação cancelada. O arquivo não será sobrescrito.\n");
+                                return 0;
+                        }
+                        printf("Entrada inválida. Por favor, digite 's' para sobrescrever ou 'n' para cancelar: ");
+                        while ((r = getchar()) != '\n' && r != EOF);
+                }
         }
+
         FILE *output_file = fopen(pbm_image.filename, "w");
         if (output_file == NULL) {
                 fprintf(stderr, "ERRO: Algo deu errado ao abrir o arquivo.\n");
