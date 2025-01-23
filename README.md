@@ -22,7 +22,6 @@ Para começar a usar este projeto, clone o repositório com o seguinte comando:
 
 ```bash
 git clone https://github.com/lPitecus/projeto_itp.git
-cd projeto_itp
 ```
 
 ## Compilando o Projeto
@@ -87,7 +86,7 @@ Para executar o gerador de código de barras, utilize a seguinte sintaxe:
 - `-h <pixels>`: Define a altura do código de barras em pixels.
   - Exemplo: `-h 70` define uma altura de 70px. O valor padrão é 50px.
 - `-n <file_name>`: Define o nome do arquivo `.pbm` gerado.
-  - Exemplo: `-n meu_codigo.pbm` gera um arquivo chamado `meu_codigo.pbm`. Se não especificado, o arquivo terá o mesmo nome do identificador.
+  - Exemplo: `-n meu_codigo` gera um arquivo chamado `meu_codigo.pbm`. Se não especificado, o arquivo terá o mesmo nome do identificador.
 
 ### Exemplo de Uso
 
