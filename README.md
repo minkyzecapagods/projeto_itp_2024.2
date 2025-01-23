@@ -1,9 +1,18 @@
 # Gerador e Leitor de Código de Barras
 
-Este repositório contém dois programas principais para a criação e leitura de códigos de barras:
+Este é um projeto desenvolvido como parte do curso de **Bacharelado em Tecnologia da Informação (BTI)** da **UFRN** (Universidade Federal do Rio Grande do Norte). O objetivo principal desse trabalho é implementar dois programas: um **gerador** e um **leitor** de códigos de barras, utilizando a linguagem **C**.
 
+### Descrição
+
+Este repositório contém dois programas principais para a criação e leitura de códigos de barras:
 - **Gerador de Código de Barras** (`gen`): Gera um arquivo `.pbm` com um código de barras baseado nas opções fornecidas.
 - **Leitor de Código de Barras** (`ext`): Extrai o identificador de um código de barras a partir de um arquivo `.pbm`.
+
+### Tecnologias Utilizadas
+
+- **Linguagem de Programação**: C
+- **Formato de Imagem**: PBM (Portable Bitmap), para representar os códigos de barras gerados
+- **Sistema Operacional**: Linux (desenvolvido e testado em ambiente Linux, mas pode ser compilado em outros sistemas com ajustes mínimos)
 
 ![Build Status](https://img.shields.io/badge/build-passing-brightgreen) ![License](https://img.shields.io/badge/license-MIT-blue) ![Version](https://img.shields.io/badge/version-1.0.0-orange)
 
@@ -151,19 +160,30 @@ A estrutura do repositório é organizada da seguinte forma:
 ### Descrição dos Diretórios
 
 - **`barcode-output/`**: Pasta onde os arquivos gerados pelo programa `gen` (códigos de barras em `.pbm`) são armazenados.
-- **`include/`**: Contém os arquivos de cabeçalho (`.h`) usados para declarar as funções e estruturas do projeto.
-- **`Makefile`**: Arquivo utilizado para automatizar o processo de compilação.
+- **`include/`**: Contém os arquivos de cabeçalho (.h) com declarações de funções e estruturas.
+- **`src/`**: Contém os arquivos de código-fonte responsáveis pela implementação das funcionalidades de geração e leitura dos códigos de barras.
+- **`Makefile`**: Script utilizado para automatizar o processo de compilação dos arquivos do projeto.
 
-## Como Contribuir
+### Objetivos do Projeto
 
-Contribuições são bem-vindas! Siga as etapas abaixo para contribuir com o projeto:
+- Aplicar os conhecimentos adquiridos durante o curso de **Bacharelado em Tecnologia da Informação**, especificamente nas áreas de **programação em C**, **algoritmos de codificação e decodificação**, e **manipulação de arquivos**.
+- Desenvolver um sistema completo para gerar e ler códigos de barras, simulando o comportamento real de sistemas de código de barras utilizados em diversos setores, como no comércio e na logística.
 
+### Contribuições
+
+Este é um projeto acadêmico, e contribuições para o aprimoramento do código são bem-vindas. Caso queira contribuir, por favor, siga as instruções de **fork** e **pull request**:
 1. **Fork o repositório**.
 2. Crie uma **branch** para a sua feature ou correção (`git checkout -b minha-feature`).
 3. Faça as modificações necessárias e **commit** suas mudanças (`git commit -am 'Adicionando nova feature'`).
 4. Envie suas mudanças para o repositório forkado (`git push origin minha-feature`).
 5. Abra um **Pull Request**.
 
-## Licença
+### Licença
 
 Este projeto está licenciado sob a Licença MIT. Consulte o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## Authors
+
+- [@minkyzecapagods](https://github.com/minkyzecapagods)
+
+- [@lPitecus](https://github.com/lPitecus)
