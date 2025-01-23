@@ -21,7 +21,7 @@ Caso não tenha essas ferramentas instaladas, consulte a documentação oficial 
 Para começar a usar este projeto, clone o repositório com o seguinte comando:
 
 ```bash
-https://github.com/lPitecus/projeto_itp.git
+git clone https://github.com/lPitecus/projeto_itp.git
 cd projeto_itp
 ```
 
