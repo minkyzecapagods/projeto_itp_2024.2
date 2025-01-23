@@ -26,29 +26,19 @@ git clone https://github.com/lPitecus/projeto_itp.git
 
 ## Compilando o Projeto
 
-O repositório já contém um `Makefile` que facilita o processo de compilação. Além disso, os arquivo compilados também já existem. No entanto, caso tenha mudado o código e deseja compilá-lo novamente, siga os passos abaixo para compilar os programas:
+O repositório já contém um `Makefile` que facilita o processo de compilação. Siga os passos abaixo para compilar os programas:
 
 ### Passo 1: Navegar até o diretório do projeto
 
-Abra o terminal e navegue até o diretório onde você clonou o repositório:
+Abra o terminal e navegue até o diretório do `projeto_ito`:
 
 ```bash
 cd projeto_itp
 ```
 
-### Passo 2: Limpando os Arquivos Compilados
+### Passo 2: Compilar o código
 
-Use o `make clean` para limpar os arquivos já presente no repositório, como objetos e binários:
-
-```bash
-make clean
-```
-
-Isso irá remover todos os arquivos gerados na pasta `build`, incluindo os executáveis e arquivos objeto.
-
-### Passo : Compilar o código
-
-Use o `make` para compilar o projeto. O comando irá gerar os executáveis `gen` e `ext` dentro da pasta `build/bin`, além de seus atalhos no próprio diretório:
+Use o `make` para compilar o projeto. O comando irá gerar os executáveis `gen` e `ext` dentro da pasta `build/bin`:
 
 ```bash
 make
@@ -58,12 +48,22 @@ make
 
 Após a compilação, os executáveis estarão localizados em:
 
-```
+```    
 gen             # Atalho para o executável
 ext             # Atalho para o executável
 build/bin/gen   # Gerador de Código de Barras
 build/bin/ext   # Leitor de Código de Barras
 ```
+
+## Limpando os Arquivos Compilados
+
+Caso deseje limpar os arquivos gerados pela compilação, como objetos e binários, use o comando `make clean`:
+
+```bash
+make clean
+```
+
+Isso irá remover todos os arquivos gerados na pasta `build`, incluindo os executáveis e arquivos objeto.
 
 ## Como Usar o Gerador de Código de Barras (`gen`)
 
@@ -135,18 +135,6 @@ A estrutura do repositório é organizada da seguinte forma:
 .
 ├── barcode-output                  # Contém arquivos de saída como imagens .pbm
 │   └── teste.pbm
-├── build
-│   ├── bin                         # Contém os executáveis
-│   │   ├── ext
-│   │   └── gen
-│   └── obj
-│       ├── definitions.o           # Contém os arquivos objeto
-│       ├── EAN-8_code_extractor.o
-│       ├── EAN-8_code_generator.o
-│       ├── funcs.o
-│       └── io.o
-├── ext -> build/bin/ext            # Executável leitor de código de barras
-├── gen -> build/bin/gen            # Executável gerador de código de barras
 ├── include                         # Contém arquivos de cabeçalho
 │   ├── definitions.h
 │   ├── funcs.h
@@ -158,16 +146,12 @@ A estrutura do repositório é organizada da seguinte forma:
     ├── EAN-8_code_generator.c
     ├── funcs.c
     └── io.c
-
 ```
 
 ### Descrição dos Diretórios
 
 - **`barcode-output/`**: Pasta onde os arquivos gerados pelo programa `gen` (códigos de barras em `.pbm`) são armazenados.
 - **`include/`**: Contém os arquivos de cabeçalho (`.h`) usados para declarar as funções e estruturas do projeto.
-- **`build/`**: Contém a estrutura de arquivos compilados:
-  - **`bin/`**: Onde os executáveis (`gen` e `ext`) são armazenados após a compilação.
-  - **`obj/`**: Contém os arquivos objeto resultantes da compilação dos arquivos fonte.
 - **`Makefile`**: Arquivo utilizado para automatizar o processo de compilação.
 
 ## Como Contribuir
