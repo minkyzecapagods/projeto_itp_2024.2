@@ -1,96 +1,183 @@
-# Código de Barras EAN-8
+# Gerador e Leitor de Código de Barras
 
-Este repositório contém dois programas para gerar e extrair códigos de barras do tipo EAN-8. Eles permitem gerar imagens de códigos de barras no formato PBM e extrair identificadores a partir dessas imagens.
+Este repositório contém dois programas principais para a criação e leitura de códigos de barras:
 
-## Descrição dos Programas
+- **Gerador de Código de Barras** (`gen`): Gera um arquivo `.pbm` com um código de barras baseado nas opções fornecidas.
+- **Leitor de Código de Barras** (`ext`): Extrai o identificador de um código de barras a partir de um arquivo `.pbm`.
 
-### 1. **Gerador de Código de Barras (gen)**
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen) ![License](https://img.shields.io/badge/license-MIT-blue) ![Version](https://img.shields.io/badge/version-1.0.0-orange)
 
-O programa **Gerador de Código de Barras** cria um arquivo de imagem PBM baseado no código de barras EAN-8 a partir de um identificador fornecido pelo usuário.
+## Requisitos
 
-#### Como usar:
+Antes de começar, verifique se você possui as seguintes ferramentas instaladas no seu sistema:
 
+- **GCC** ou outro compilador C
+- **Make** para automação do processo de compilação
+
+Caso não tenha essas ferramentas instaladas, consulte a documentação oficial do GCC e do Make para instruções sobre como instalá-las.
+
+## Clonando o Repositório
+
+Para começar a usar este projeto, clone o repositório com o seguinte comando:
+
+```bash
+git clone https://github.com/seu_usuario/seu_repositorio.git
+cd seu_repositorio
+```
+
+## Compilando o Projeto
+
+O repositório já contém um `Makefile` que facilita o processo de compilação. Além disso, os arquivo compilados também já existem. No entanto, caso tenha mudado o código e deseja compilá-lo novamente, siga os passos abaixo para compilar os programas:
+
+### Passo 1: Navegar até o diretório do projeto
+
+Abra o terminal e navegue até o diretório onde você clonou o repositório:
+
+```bash
+cd seu_repositorio
+```
+
+### Passo 2: Limpando os Arquivos Compilados
+
+Use o `make clean` para limpar os arquivos já presente no repositório, como objetos e binários:
+
+```bash
+make clean
+```
+
+Isso irá remover todos os arquivos gerados na pasta `build`, incluindo os executáveis e arquivos objeto.
+
+### Passo : Compilar o código
+
+Use o `make` para compilar o projeto. O comando irá gerar os executáveis `gen` e `ext` dentro da pasta `build/bin`, além de seus atalhos no próprio diretório:
+
+```bash
+make
+```
+
+### Passo 3: Verificar a compilação
+
+Após a compilação, os executáveis estarão localizados em:
+
+```
+gen             # Atalho para o executável
+ext             # Atalho para o executável
+build/bin/gen   # Gerador de Código de Barras
+build/bin/ext   # Leitor de Código de Barras
+```
+
+## Como Usar o Gerador de Código de Barras (`gen`)
+
+O programa **gen** permite ao usuário gerar códigos de barras em formato `.pbm` com diversas opções de personalização.
+
+### Sintaxe Básica
+
+Para executar o gerador de código de barras, utilize a seguinte sintaxe:
+
+```bash
 ./gen <opção> ... <identificador>
+```
 
-#### Opções:
+### Opções de Linha de Comando
 
-- `-m <pixels>`  
-  Define a margem do código de barras, em pixels.  
-  Sem a opção `-m`, a margem padrão será de **4px**.
+- `-m <pixels>`: Define a margem do código de barras em pixels.
+  - Exemplo: `-m 10` define uma margem de 10px. Se não especificado, o valor padrão será 4px.
+- `-a <pixels>`: Define a área das barras (largura) em pixels.
+  - Exemplo: `-a 5` define a largura das barras como 5px. O valor padrão é 3px.
+- `-h <pixels>`: Define a altura do código de barras em pixels.
+  - Exemplo: `-h 70` define uma altura de 70px. O valor padrão é 50px.
+- `-n <file_name>`: Define o nome do arquivo `.pbm` gerado.
+  - Exemplo: `-n meu_codigo.pbm` gera um arquivo chamado `meu_codigo.pbm`. Se não especificado, o arquivo terá o mesmo nome do identificador.
 
-- `-a <pixels>`  
-  Define a área das barras, em pixels.  
-  Sem a opção `-a`, a área das barras será de **3px**.
+### Exemplo de Uso
 
-- `-h <pixels>`  
-  Define a altura do código de barras, em pixels.  
-  Sem a opção `-h`, a altura será de **50px**.
+Para gerar um código de barras com:
 
-- `-n <file_name>`  
-  Define o nome do arquivo de saída com a extensão `.pbm`.  
-  Sem a opção `-n`, o nome do arquivo será o **identificador** fornecido.
+- Margem de 5px
+- Largura das barras de 4px
+- Altura de 60px
+- Nome do arquivo de saída como `codigo_barras.pbm`
 
-#### Exemplo de uso:
+Use o seguinte comando:
 
-./gen -m 6 -a 5 -h 60 -n codigo_barras.pbm 12345678
+```bash
+./gen -m 5 -a 4 -h 60 -n codigo_barras.pbm 12345678
+```
 
-Isso gerará um arquivo **codigo_barras.pbm** com margem de **6px**, área das barras de **5px**, altura de **60px** e identificador **12345678**.
+Isso irá gerar um arquivo chamado `codigo_barras.pbm` no diretório atual, com as configurações fornecidas.
 
----
+## Como Usar o Leitor de Código de Barras (`ext`)
 
-### 2. **Leitor de Código de Barras (ext)**
+O programa **ext** permite que você extraia o identificador de um código de barras a partir de um arquivo `.pbm`.
 
-O programa **Leitor de Código de Barras** extrai o identificador do código de barras a partir de um arquivo de imagem PBM gerado pelo programa acima.
+### Sintaxe Básica
 
-#### Como usar:
+Para extrair o identificador de um código de barras, utilize o seguinte comando:
 
-./ext <nome_do_arquivo>
+```bash
+./EAN-8_code_extractor <nome_do_arquivo>
+```
 
-#### Exemplo de uso:
+### Exemplo de Uso
 
-./ext barcode-output/12345678.pbm
+Para extrair o identificador de um código de barras a partir de um arquivo chamado `teste.pbm` localizado dentro da pasta `barcode-output/`, use o seguinte comando:
 
-Isso irá extrair o identificador do código de barras do arquivo **12345678.pbm** localizado na pasta `barcode-output`.
+```bash
+./ext barcode-output/teste.pbm
+```
 
-### Observação:
+Isso irá exibir o identificador contido no código de barras do arquivo `teste.pbm`.
 
-- Para acessar arquivos dentro da pasta `barcode-output`, insira o caminho `barcode-output/` antes do nome do arquivo.
+## Estrutura do Projeto
 
----
+A estrutura do repositório é organizada da seguinte forma:
 
-## Estrutura de Diretórios
-
+```bash
 my_project/
-├── barcode-output/             # Contém os arquivos de saída .pbm gerados  
-├── build/                      # Diretório de build  
-│   ├── bin/                    # Executáveis (gen, ext)  
-│   └── obj/                    # Arquivos objeto  
-├── include/                    # Arquivos de cabeçalho  
-├── Makefile                    # Script de build  
-├── ext -> build/bin/ext         # Link simbólico para o executável ext  
-├── gen -> build/bin/gen         # Link simbólico para o executável gen  
-└── src/                        # Código-fonte (funções, io, etc.)  
+├── barcode-output/             # Contém os arquivos de saída, como imagens .pbm
+│   └── teste.pbm
+├── include/                    # Contém os arquivos de cabeçalho (headers)
+│   ├── definitions.h
+│   ├── funcs.h
+│   └── io.h
+├── Makefile                    # Script de compilação
+├── gen                         # Executável do Gerador de Código de Barras
+├── ext                         # Executável do Leitor de Código de Barras
+└── build/
+    ├── bin/                    # Contém os executáveis compilados
+    │   ├── gen
+    │   └── ext
+    └── obj/                    # Contém os arquivos objeto
+        ├── EAN-8_code_generator.o
+        ├── EAN-8_code_extractor.o
+        ├── funcs.o
+        ├── io.o
+        └── definitions.o
+```
 
-## Compilação e Execução
+### Descrição dos Diretórios
 
-Para compilar e executar os programas, basta usar o `Makefile`:
+- **`barcode-output/`**: Pasta onde os arquivos gerados pelo programa `gen` (códigos de barras em `.pbm`) são armazenados.
+- **`include/`**: Contém os arquivos de cabeçalho (`.h`) usados para declarar as funções e estruturas do projeto.
+- **`build/`**: Contém a estrutura de arquivos compilados:
+  - **`bin/`**: Onde os executáveis (`gen` e `ext`) são armazenados após a compilação.
+  - **`obj/`**: Contém os arquivos objeto resultantes da compilação dos arquivos fonte.
+- **`Makefile`**: Arquivo utilizado para automatizar o processo de compilação.
 
-1. **Compilação**: Execute o comando `make` para compilar os programas.
+## Como Contribuir
 
-   make
+Contribuições são bem-vindas! Siga as etapas abaixo para contribuir com o projeto:
 
-2. **Executar o Gerador de Código de Barras**:
-
-   Após a compilação, você pode executar o gerador de código de barras com o comando:
-
-   ./gen <opção> ... <identificador>
-
-3. **Executar o Leitor de Código de Barras**:
-
-   Para extrair o identificador do código de barras, use:
-
-   ./ext <nome_do_arquivo>
+1. **Fork o repositório**.
+2. Crie uma **branch** para a sua feature ou correção (`git checkout -b minha-feature`).
+3. Faça as modificações necessárias e **commit** suas mudanças (`git commit -am 'Adicionando nova feature'`).
+4. Envie suas mudanças para o repositório forkado (`git push origin minha-feature`).
+5. Abra um **Pull Request**.
 
 ## Licença
 
-Este projeto está licenciado sob a Licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+Este projeto está licenciado sob a Licença MIT. Consulte o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+## Support
+
+If you encounter any issues or have questions, please open an issue in the GitHub repository.
