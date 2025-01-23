@@ -21,8 +21,8 @@ Caso não tenha essas ferramentas instaladas, consulte a documentação oficial 
 Para começar a usar este projeto, clone o repositório com o seguinte comando:
 
 ```bash
-git clone https://github.com/seu_usuario/seu_repositorio.git
-cd seu_repositorio
+https://github.com/lPitecus/projeto_itp.git
+cd projeto_itp
 ```
 
 ## Compilando o Projeto
@@ -34,7 +34,7 @@ O repositório já contém um `Makefile` que facilita o processo de compilação
 Abra o terminal e navegue até o diretório onde você clonou o repositório:
 
 ```bash
-cd seu_repositorio
+cd projeto_itp
 ```
 
 ### Passo 2: Limpando os Arquivos Compilados
@@ -96,15 +96,15 @@ Para gerar um código de barras com:
 - Margem de 5px
 - Largura das barras de 4px
 - Altura de 60px
-- Nome do arquivo de saída como `codigo_barras.pbm`
+- Nome do arquivo de saída como `codigo_barras`
 
 Use o seguinte comando:
 
 ```bash
-./gen -m 5 -a 4 -h 60 -n codigo_barras.pbm 12345678
+./gen -m 5 -a 4 -h 60 -n codigo_barras 12345678
 ```
 
-Isso irá gerar um arquivo chamado `codigo_barras.pbm` no diretório atual, com as configurações fornecidas.
+Isso irá gerar um arquivo chamado `codigo_barras.pbm` no diretório `barcode-output` dentro do projeto com as configurações fornecidas.
 
 ## Como Usar o Leitor de Código de Barras (`ext`)
 
@@ -115,7 +115,7 @@ O programa **ext** permite que você extraia o identificador de um código de ba
 Para extrair o identificador de um código de barras, utilize o seguinte comando:
 
 ```bash
-./EAN-8_code_extractor <nome_do_arquivo>
+./ext <nome_do_arquivo>
 ```
 
 ### Exemplo de Uso
@@ -177,7 +177,3 @@ Contribuições são bem-vindas! Siga as etapas abaixo para contribuir com o pro
 ## Licença
 
 Este projeto está licenciado sob a Licença MIT. Consulte o arquivo [LICENSE](LICENSE) para mais detalhes.
-
-## Support
-
-If you encounter any issues or have questions, please open an issue in the GitHub repository.
