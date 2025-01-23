@@ -132,26 +132,33 @@ Isso irá exibir o identificador contido no código de barras do arquivo `teste.
 A estrutura do repositório é organizada da seguinte forma:
 
 ```bash
-my_project/
-├── barcode-output/             # Contém os arquivos de saída, como imagens .pbm
-│   └── teste.pbm
-├── include/                    # Contém os arquivos de cabeçalho (headers)
-│   ├── definitions.h
-│   ├── funcs.h
-│   └── io.h
-├── Makefile                    # Script de compilação
-├── gen                         # Executável do Gerador de Código de Barras
-├── ext                         # Executável do Leitor de Código de Barras
-└── build/
-    ├── bin/                    # Contém os executáveis compilados
-    │   ├── gen
-    │   └── ext
-    └── obj/                    # Contém os arquivos objeto
-        ├── EAN-8_code_generator.o
-        ├── EAN-8_code_extractor.o
-        ├── funcs.o
-        ├── io.o
-        └── definitions.o
+.
+├── barcode-output                  # Contém arquivos de saída como imagens .pbm
+│   └── teste.pbm
+├── build
+│   ├── bin                         # Contém os executáveis
+│   │   ├── ext
+│   │   └── gen
+│   └── obj
+│       ├── definitions.o           # Contém os arquivos objeto
+│       ├── EAN-8_code_extractor.o
+│       ├── EAN-8_code_generator.o
+│       ├── funcs.o
+│       └── io.o
+├── ext -> build/bin/ext            # Executável leitor de código de barras
+├── gen -> build/bin/gen            # Executável gerador de código de barras
+├── include                         # Contém arquivos de cabeçalho
+│   ├── definitions.h
+│   ├── funcs.h
+│   └── io.h
+├── Makefile                        # Script de compilação
+└── src                             # Contém os arquivos de código fonte
+    ├── definitions.c
+    ├── EAN-8_code_extractor.c
+    ├── EAN-8_code_generator.c
+    ├── funcs.c
+    └── io.c
+
 ```
 
 ### Descrição dos Diretórios
